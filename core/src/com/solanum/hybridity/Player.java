@@ -51,7 +51,6 @@ public class Player extends Actor{
 
     public void act(float delta){
 
-        //System.out.println(sprite.getRotation()%360);
         //LAST SHOT FIRED
         lastShot += delta;
 
@@ -97,6 +96,9 @@ public class Player extends Actor{
         }
 
 
+        if(sprite.getRotation()<0){
+            sprite.setRotation(360+sprite.getRotation());
+        }
 
 
 
