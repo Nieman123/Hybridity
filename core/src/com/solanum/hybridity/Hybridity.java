@@ -12,6 +12,8 @@ public class Hybridity extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
     Stage gameStage;
+    int numOfSeeds = 6;
+    float degreeDivision;
 
 	@Override
 	public void create () {
@@ -21,6 +23,15 @@ public class Hybridity extends ApplicationAdapter {
         Mainland ml = new Mainland(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
         gameStage.addActor(ml);
         gameStage.addActor(player);
+
+        degreeDivision=360/numOfSeeds;
+
+        for(int i =0;i<numOfSeeds;i++){
+
+        }
+
+
+
 	}
 
 	@Override

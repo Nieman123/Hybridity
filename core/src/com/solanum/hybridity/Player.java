@@ -36,9 +36,9 @@ public class Player extends Actor{
 
     public Player(){
         bullets = new ArrayList();
-        shotDelay = .15f;
+        shotDelay = .1025f;
         lastShot=0;
-        rotationSpeed = 8;
+        rotationSpeed = 6;
 
         tex = new Texture("Player.png");
         sprite = new Sprite(tex);
@@ -50,6 +50,7 @@ public class Player extends Actor{
 
     public void act(float delta){
 
+        getStage().getActors();
         //LAST SHOT FIRED
         lastShot += delta;
 

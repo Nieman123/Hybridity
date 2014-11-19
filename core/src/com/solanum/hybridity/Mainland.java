@@ -19,14 +19,20 @@ public class Mainland extends Actor {
     ShapeRenderer render = new ShapeRenderer();
     ArrayList<Float> verts;
     float[] v;
-    float oX;
-    float oY;
+    public int oX;
+    public int oY;
 
-    public Mainland(float x, float y){
+    public Mainland(int x, int y){
         render = new ShapeRenderer();
         verts = new ArrayList();
 
+        oX = x;
+        oY = y;
 
+        /**
+         * THE FLOAT CLASS USED BELOW IS IN REFERENCE TO THE POINT 2D GEOMETRY SUBSET FOR POINTS
+         * THAT ARE FLOATS. NOT THE WRAPPER CLASS FOR A FLOAT PRIMITIVE
+         */
         verts.add(new Float(x,y+400));
         verts.add(new Float(x+400,y));
         verts.add(new Float(x,y-400));
