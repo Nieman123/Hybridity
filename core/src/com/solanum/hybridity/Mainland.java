@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import java.awt.geom.Point2D.Float;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,18 +17,24 @@ import java.util.ArrayList;
  */
 public class Mainland extends Actor {
     ShapeRenderer render = new ShapeRenderer();
-    ArrayList<Point> verts;
+    ArrayList<Float> verts;
     float[] v;
+    float oX;
+    float oY;
 
-
-    public Mainland(){
+    public Mainland(float x, float y){
         render = new ShapeRenderer();
         verts = new ArrayList();
 
-        verts.add(new Point(200,200));
-        verts.add(new Point(300,300));
-        verts.add(new Point(200,400));
-        verts.add(new Point(100,300));
+
+        verts.add(new Float(x,y+400));
+        verts.add(new Float(x+400,y));
+        verts.add(new Float(x,y-400));
+        verts.add(new Float(x-400,y));
+
+
+
+
     }
 
     public void act(float delta){
@@ -36,12 +43,13 @@ public class Mainland extends Actor {
 
     public void draw(Batch batch, float parentAlpha){
         batch.end();
+        render.setProjectionMatrix(getStage().getCamera().combined);
         render.setAutoShapeType(true);
         render.begin();
         render.setColor(Color.CYAN);
         v = new float[verts.size()*2];
         int i =0;
-        for(Point c : verts){
+        for(Float c : verts){
             v[i]=(float)c.getX();
             v[i+1]=(float)c.getY();
             i+=2;
@@ -49,6 +57,7 @@ public class Mainland extends Actor {
 
         render.polygon(v);
         render.end();
+
 
         batch.begin();
 

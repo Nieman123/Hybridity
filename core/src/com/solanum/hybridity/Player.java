@@ -22,7 +22,7 @@ import java.util.Iterator;
  */
 public class Player extends Actor{
 
-    private final float speed=3;
+    private float speed = 8;
     private final ArrayList bullets;
     private float rotation;
     private final float shotDelay;
@@ -32,20 +32,19 @@ public class Player extends Actor{
     private final Rectangle boundBox = null;
     private final Texture tex;
     private final Sprite sprite;
-    private final Sound laser = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot-01.wav"));
+    private final Sound laser = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot-03.wav"));
 
     public Player(){
-
         bullets = new ArrayList();
-        shotDelay = .1f;
+        shotDelay = .15f;
         lastShot=0;
-        rotationSpeed = 5;
+        rotationSpeed = 8;
 
         tex = new Texture("Player.png");
         sprite = new Sprite(tex);
         sprite.setPosition(0,0);
-        setX(0);
-        setY(0);
+        setX(Gdx.graphics.getWidth()/2);
+        setY(Gdx.graphics.getHeight()/2);
 
     }
 
@@ -85,8 +84,6 @@ public class Player extends Actor{
             sprite.rotate(-rotationSpeed);
         }
 
-        //LASER
-        //todo: fix sprinkler glitch
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             if(lastShot>shotDelay) {
                 this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation()%360));
@@ -105,8 +102,7 @@ public class Player extends Actor{
 
         setRotation(rotation);
 
-        //PERFORM CAMERA ROTATION LAST
-        //getStage().getCamera().translate(this.getX()-lastX, this.getY()-lastY,0);
+        getStage().getCamera().translate(this.getX()-lastX, this.getY()-lastY,0);
 
         sprite.setPosition((float)getX(),(float)getY());
     }

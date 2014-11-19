@@ -33,14 +33,15 @@ public class Bullet extends Actor {
     private float timeSinceSpawn;
 
 
-    public Bullet(float x, float y, double angle) {
+    public Bullet(float x, float y, float angle) {
 
         bulletPixmap = new Pixmap(10, 10, Pixmap.Format.RGB888);
         bulletPixmap.setColor(Color.WHITE);
         bulletPixmap.fill();
-        bulletTexture = new Texture(bulletPixmap);
+        bulletTexture = new Texture("Bullet.png");
         bulletSprite = new Sprite(bulletTexture);
 
+        bulletSprite.setRotation(angle);
 
         bulletSprite.setPosition(x-bulletSprite.getWidth()/2,y-bulletSprite.getHeight()/2);
 
@@ -48,7 +49,7 @@ public class Bullet extends Actor {
         setWidth(bulletSprite.getWidth());
         setHeight(bulletSprite.getHeight());
 
-        this.speed = (double) 8;
+        this.speed = (double) 20;
         this.angle = angle;
 
         bounds = new Rectangle();
@@ -85,6 +86,7 @@ public class Bullet extends Actor {
     }
 
     public void draw(Batch batch, float parentAlpha) {
+
         bulletSprite.draw(batch);
 
     }
