@@ -26,7 +26,29 @@ public class Hybridity extends ApplicationAdapter {
 
         degreeDivision=360/numOfSeeds;
 
+
+        /**
+         * Build circle of seeders
+         */
+        float speed = 800;
+        float height;
+        float width;
+        float angle;
+
+        int mlX = ml.oX;
+        int mlY = ml.oY;
+
         for(int i =0;i<numOfSeeds;i++){
+            float sin = (float)Math.sin(Math.toRadians(degreeDivision*i));
+            height = sin * speed;
+            width = (float)Math.sqrt((speed * speed) - (height * height));
+
+            if (degreeDivision > 90 && degreeDivision < 270) {
+                width = -width;
+
+            }
+
+            gameStage.addActor(new Seeder(mlX+width, mlY+height,mlX,mlY));
 
         }
 
