@@ -39,6 +39,8 @@ public class Hybridity extends ApplicationAdapter {
         int mlY = ml.oY;
 
         for(int i =0;i<numOfSeeds;i++){
+            angle = (degreeDivision*i);
+
             float sin = (float)Math.sin(Math.toRadians(degreeDivision*i));
             height = sin * speed;
             width = (float)Math.sqrt((speed * speed) - (height * height));
@@ -47,6 +49,11 @@ public class Hybridity extends ApplicationAdapter {
                 width = -width;
 
             }
+
+            float sX;
+            float sY;
+
+
 
             gameStage.addActor(new Seeder(mlX+width, mlY+height,mlX,mlY));
 
