@@ -14,53 +14,24 @@ public class Hybridity extends ApplicationAdapter {
     Stage gameStage;
     int numOfSeeds = 6;
     float degreeDivision;
+    Mainland ml;
 
 	@Override
 	public void create () {
         gameStage = new Stage();
 
         Player player = new Player();
-        Mainland ml = new Mainland(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
+        ml = new Mainland(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
         gameStage.addActor(ml);
         gameStage.addActor(player);
 
         degreeDivision=360/numOfSeeds;
 
 
-        /**
-         * Build circle of seeders
-         */
-        float speed = 800;
-        float height;
-        float width;
-        float angle;
 
-        int mlX = ml.oX;
-        int mlY = ml.oY;
-
-        for(int i =0;i<numOfSeeds;i++){
-            angle = (degreeDivision*i);
-
-            float sin = (float)Math.sin(Math.toRadians(degreeDivision*i));
-            height = sin * speed;
-            width = (float)Math.sqrt((speed * speed) - (height * height));
-
-            if (degreeDivision > 90 && degreeDivision < 270) {
-                width = -width;
-
-            }
-
-            float sX;
-            float sY;
-
-
-
-            gameStage.addActor(new Seeder(mlX+width, mlY+height,mlX,mlY));
-
+        for(int i=0; i<360;i++){
+            plantSeed(i, 400);
         }
-
-
-
 	}
 
 	@Override
@@ -71,4 +42,25 @@ public class Hybridity extends ApplicationAdapter {
         gameStage.draw();
 
 	}
+
+
+    public void plantSeed(float angle, float distance ){
+
+        angle = angle %360;
+        float nAngle = angle %90;
+
+        float adjacent;
+        float opposite;
+        float hypoteneuse = distance;
+        double sin = Math.sin(Math.toRadians(nAngle));
+
+        opposite =(float) sin * hypoteneuse;
+
+        adjacent = (float)Math.sqrt((hypoteneuse*hypoteneuse)-(opposite*opposite));
+
+        gameStage.addActor(new Seeder(ml.oX+adjacent,ml.oY+opposite,ml.oX, ml.oY ));
+
+
+
+    }
 }
