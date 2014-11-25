@@ -29,8 +29,8 @@ public class Hybridity extends ApplicationAdapter {
 
 
 
-        for(int i=0; i<360;i++){
-            plantSeed(i, 400);
+        for(int i=1; i<=numOfSeeds;i++){
+            plantSeed(i*degreeDivision, 900*i);
         }
 	}
 
@@ -58,7 +58,30 @@ public class Hybridity extends ApplicationAdapter {
 
         adjacent = (float)Math.sqrt((hypoteneuse*hypoteneuse)-(opposite*opposite));
 
-        gameStage.addActor(new Seeder(ml.oX+adjacent,ml.oY+opposite,ml.oX, ml.oY ));
+        float newX;
+        float newY;
+
+        if(angle<180){
+            if(angle>=90){
+                newX=-opposite;
+                newY =adjacent;
+            } else{
+                newX= adjacent;
+                newY= opposite;
+            }
+        } else{
+            if(angle>=270){
+                newX = opposite;
+                newY = -adjacent;
+            } else{
+                newX = -adjacent;
+                newY = -opposite;
+            }
+        }
+
+        gameStage.addActor(new Seeder(ml.oX+newX,ml.oY+newY,ml.oX, ml.oY ));
+
+
 
 
 
