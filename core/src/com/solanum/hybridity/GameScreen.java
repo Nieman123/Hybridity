@@ -3,6 +3,7 @@ package com.solanum.hybridity;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,9 +14,11 @@ public class GameScreen implements Screen {
     SpriteBatch batch;
     Texture img;
     Stage gameStage;
-    int numOfSeeds = 361;
+    int numOfSeeds = 3;
     float degreeDivision;
     Mainland ml;
+    Music music;
+
 
     GameScreen(Hybridity session) {
         game = session;
@@ -32,6 +35,11 @@ public class GameScreen implements Screen {
         for (int i = 1; i <= numOfSeeds; i++) {
             plantSeed(i * degreeDivision, 900 * i);
         }
+
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
+        music.setVolume(.5f);
+
     }
 
 
@@ -74,6 +82,9 @@ public class GameScreen implements Screen {
 
         gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY));
 
+
+
+
     }
 
     @Override
@@ -92,21 +103,24 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        music.play();
 
     }
 
     @Override
     public void hide() {
+        music.stop();
 
     }
 
     @Override
     public void pause() {
-
+        music.pause();
     }
 
     @Override
     public void resume() {
+        music.play();
 
     }
 

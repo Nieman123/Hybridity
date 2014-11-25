@@ -46,6 +46,7 @@ public class Player extends Actor{
         setX(Gdx.graphics.getWidth()/2);
         setY(Gdx.graphics.getHeight()/2);
 
+
     }
 
     public void act(float delta){
@@ -88,7 +89,7 @@ public class Player extends Actor{
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             if(lastShot>shotDelay) {
                 this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation()%360));
-                laser.play();
+                laser.play(.1f);
                 lastShot=0;
             }
         }

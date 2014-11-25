@@ -49,7 +49,7 @@ public class SplashScreen implements Screen {
         }else{
             idleTime+=delta;
             if(idleTime>5){
-                game.setScreen(game.gameScreen);
+                game.setScreen(game.titleScreen);
                 this.dispose();
             }
         }

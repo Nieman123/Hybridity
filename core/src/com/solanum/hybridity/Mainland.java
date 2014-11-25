@@ -21,6 +21,7 @@ public class Mainland extends Actor {
     float[] v;
     public int oX;
     public int oY;
+    Polygon shape;
 
     public Mainland(int x, int y){
         render = new ShapeRenderer();
@@ -33,18 +34,27 @@ public class Mainland extends Actor {
          * THE FLOAT CLASS USED BELOW IS IN REFERENCE TO THE POINT 2D GEOMETRY SUBSET FOR POINTS
          * THAT ARE FLOATS. NOT THE WRAPPER CLASS FOR A FLOAT PRIMITIVE
          */
-        verts.add(new Float(x,y+400));
-        verts.add(new Float(x+400,y));
-        verts.add(new Float(x,y-400));
-        verts.add(new Float(x-400,y));
+        verts.add(new Float(x, y + 400));
+        verts.add(new Float(x + 400, y));
+        verts.add(new Float(x, y - 400));
+        verts.add(new Float(x - 400, y));
 
-
-
+        this.setName("ml");
 
     }
 
     public void act(float delta){
 
+    }
+
+    public boolean containsPoint(int x, int y){
+        Polygon shape = new Polygon();
+
+        for(int i = 0; i < verts.size(); i++){
+            shape.addPoint((int)verts.get(i).getX(),(int)verts.get(i).getY());
+        }
+
+       return shape.contains(x,y);
     }
 
     public void draw(Batch batch, float parentAlpha){

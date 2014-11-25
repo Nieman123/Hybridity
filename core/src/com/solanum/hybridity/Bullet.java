@@ -54,6 +54,8 @@ public class Bullet extends Actor {
 
         bounds = new Rectangle();
 
+        setOrigin(this.getX()+bulletSprite.getWidth()/2, this.getY()+bulletSprite.getHeight()/2);
+
         timeSinceSpawn = 0;
 
     }
@@ -71,6 +73,25 @@ public class Bullet extends Actor {
 
         }
 
+
+        if(!((Mainland)getStage().getRoot().findActor("ml")).containsPoint((int)(getX()+bulletSprite.getWidth()/2),(int)(getY()+bulletSprite.getHeight()/2))){
+           this.destroy();
+           System.out.println("MISSING");
+
+        }
+
+        Actor[] actors = getStage().getActors().toArray();
+
+
+        for(Actor c : actors){
+            if(c instanceof Seeder){
+                if(Intersector.overlaps(getBounds(), ((Seeder)c).getBounds())){
+                    this.destroy();
+                }
+            }
+        }
+
+
         setPosition((float)(getX()+width),(float)(getY()+height));
 
         bulletSprite.setPosition(getX(),getY());
@@ -82,7 +103,12 @@ public class Bullet extends Actor {
             this.destroy();
         }
 
+        bounds.set(bulletSprite.getBoundingRectangle());
 
+    }
+
+    public Rectangle getBounds(){
+        return bulletSprite.getBoundingRectangle();
     }
 
     public void draw(Batch batch, float parentAlpha) {
