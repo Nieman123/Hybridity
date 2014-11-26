@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.solanum.hybridity.GameScreen;
 import com.solanum.hybridity.Hybridity;
 
-public class HtmlLauncher extends GwtApplication {
+class HtmlLauncher extends GwtApplication {
 
         @Override
         public GwtApplicationConfiguration getConfig () {

@@ -1,23 +1,31 @@
 package com.solanum.hybridity;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-public class GameScreen implements Screen {
-    Game game;
+
+/**
+ * @author Aldous
+ */
+
+class GameScreen implements Screen {
+    private Hybridity game;
     SpriteBatch batch;
     Texture img;
-    Stage gameStage;
-    int numOfSeeds = 3;
-    float degreeDivision;
-    Mainland ml;
-    Music music;
+    private Stage gameStage;
+    private int numOfSeeds = 1;
+    private float degreeDivision;
+    private Mainland ml;
+    private Music music;
+    public static int phase = 1;
+
+    private boolean playerActive = false;
 
 
     GameScreen(Hybridity session) {
@@ -43,9 +51,7 @@ public class GameScreen implements Screen {
     }
 
 
-
-
-    public void plantSeed(float angle, float distance) {
+    void plantSeed(float angle, float distance) {
 
         angle = angle % 360;
         float nAngle = angle % 90;
@@ -83,8 +89,6 @@ public class GameScreen implements Screen {
         gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY));
 
 
-
-
     }
 
     @Override
@@ -93,6 +97,17 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         gameStage.act();
         gameStage.draw();
+
+        playerActive = false;
+        for (Actor c : gameStage.getActors()) {
+            if (c instanceof Player)
+                playerActive = true;
+        }
+
+        if (!playerActive) {
+            game.setScreen(game.loseScreen);
+        }
+
 
     }
 
@@ -103,7 +118,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        music.play();
+        //music.play();
 
     }
 
@@ -120,7 +135,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
-        music.play();
+        //music.play();
 
     }
 

@@ -14,14 +14,14 @@ import java.awt.*;
 /**
  * @Aldous
  */
-public class SplashScreen implements Screen {
-    Texture tex;
-    Sprite splash;
-    Hybridity game;
-    SpriteBatch batch;
-    Sound chime;
-    boolean sliding =true;
-    float idleTime;
+class SplashScreen implements Screen {
+    private Texture tex;
+    private Sprite splash;
+    private Hybridity game;
+    private SpriteBatch batch;
+    private Sound chime;
+    private boolean sliding =true;
+    private float idleTime;
 
     SplashScreen(Hybridity session){
         game = (Hybridity)session;

@@ -6,24 +6,25 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+
 import java.awt.geom.Point2D.Float;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * Created by Aldous
+ * @author Aldous
  * ITS Room - "Silence"
  */
-public class Mainland extends Actor {
-    ShapeRenderer render = new ShapeRenderer();
-    ArrayList<Float> verts;
-    float[] v;
+class Mainland extends Actor {
+    private ShapeRenderer render = new ShapeRenderer();
+    private ArrayList<Float> verts;
+    private float[] v;
     public int oX;
     public int oY;
     Polygon shape;
 
-    public Mainland(int x, int y){
+    public Mainland(int x, int y) {
         render = new ShapeRenderer();
         verts = new ArrayList();
 
@@ -43,32 +44,32 @@ public class Mainland extends Actor {
 
     }
 
-    public void act(float delta){
+    public void act(float delta) {
 
     }
 
-    public boolean containsPoint(int x, int y){
+    public boolean containsPoint(int x, int y) {
         Polygon shape = new Polygon();
 
-        for(int i = 0; i < verts.size(); i++){
-            shape.addPoint((int)verts.get(i).getX(),(int)verts.get(i).getY());
+        for (int i = 0; i < verts.size(); i++) {
+            shape.addPoint((int) verts.get(i).getX(), (int) verts.get(i).getY());
         }
 
-       return shape.contains(x,y);
+        return shape.contains(x, y);
     }
 
-    public void draw(Batch batch, float parentAlpha){
+    public void draw(Batch batch, float parentAlpha) {
         batch.end();
         render.setProjectionMatrix(getStage().getCamera().combined);
         render.setAutoShapeType(true);
         render.begin();
         render.setColor(Color.CYAN);
-        v = new float[verts.size()*2];
-        int i =0;
-        for(Float c : verts){
-            v[i]=(float)c.getX();
-            v[i+1]=(float)c.getY();
-            i+=2;
+        v = new float[verts.size() * 2];
+        int i = 0;
+        for (Float c : verts) {
+            v[i] = (float) c.getX();
+            v[i + 1] = (float) c.getY();
+            i += 2;
         }
 
         render.polygon(v);

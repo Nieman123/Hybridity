@@ -3,24 +3,21 @@ package com.solanum.hybridity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+
 import java.util.ArrayList;
-import java.util.Iterator;
+
 
 /**
  * @author Aldous
- * Machinedrum- Vapor City Archives
+   Machinedrum- Vapor City Archives
  */
-public class Player extends Actor{
+class Player extends Actor {
 
     private float speed = 8;
     private final ArrayList bullets;
@@ -34,22 +31,25 @@ public class Player extends Actor{
     private final Sprite sprite;
     private final Sound laser = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot-03.wav"));
 
-    public Player(){
+    public Player() {
         bullets = new ArrayList();
         shotDelay = .1025f;
-        lastShot=0;
+        lastShot = 0;
         rotationSpeed = 6;
 
         tex = new Texture("Player.png");
         sprite = new Sprite(tex);
-        sprite.setPosition(0,0);
-        setX(Gdx.graphics.getWidth()/2);
-        setY(Gdx.graphics.getHeight()/2);
+        sprite.setPosition(0, 0);
+        setX(Gdx.graphics.getWidth() / 2);
+        setY(Gdx.graphics.getHeight() / 2);
+
+        setWidth(sprite.getWidth());
+        setHeight(sprite.getHeight());
 
 
     }
 
-    public void act(float delta){
+    public void act(float delta) {
 
         getStage().getActors();
         //LAST SHOT FIRED
@@ -60,67 +60,86 @@ public class Player extends Actor{
         float lastY = getY();
 
         //DIRECTIONAL INPUT
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             setPosition(getX() - speed, getY());
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.W)){
-            setPosition(getX(),getY()+speed);
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            setPosition(getX(), getY() + speed);
 
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)){
-            setPosition(getX(),getY()-speed);
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            setPosition(getX(), getY() - speed);
 
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             setPosition(getX() + speed, getY());
 
         }
 
         //ADD BACK ROTATION FUNCTIONS ONCE A SPRITE HAS BEEN ADDED
-        if(Gdx.input.isKeyPressed(Input.Keys.J)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
             sprite.rotate(rotationSpeed);
 
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.L)){
+        if (Gdx.input.isKeyPressed(Input.Keys.L)) {
             sprite.rotate(-rotationSpeed);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            if(lastShot>shotDelay) {
-                this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation()%360));
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (lastShot > shotDelay) {
+                this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() % 360));
                 laser.play(.1f);
-                lastShot=0;
+                lastShot = 0;
             }
         }
 
 
-        if(sprite.getRotation()<0){
-            sprite.setRotation(360+sprite.getRotation());
+        /**
+         * CONTROLLER MAPPINGS
+         */
+/*
+        Controller controller = Controllers.getControllers().first();
+
+
+        if(Gdx.input.isButtonPressed(Input.Keys.DPAD_UP)){
+            System.out.println("HIT");
+        }*/
+
+
+        if (sprite.getRotation() < 0) {
+            sprite.setRotation(360 + sprite.getRotation());
         }
-
-
 
 
         setRotation(rotation);
 
-        getStage().getCamera().translate(this.getX()-lastX, this.getY()-lastY,0);
+        getStage().getCamera().translate(this.getX() - lastX, this.getY() - lastY, 0);
 
-        sprite.setPosition((float)getX(),(float)getY());
+        int centerX = (int) (getX() + (getWidth() / 2));
+        int centerY = (int) (getY() + (getHeight() / 2));
+
+        if (GameScreen.phase == 1) {
+            if (!((Mainland) getStage().getRoot().findActor("ml")).containsPoint(centerX, centerY)) {
+                this.destroy();
+            }
+        }
+
+        sprite.setPosition((float) getX(), (float) getY());
     }
 
-    public void draw(Batch batch, float parentAlpha){
+    public void draw(Batch batch, float parentAlpha) {
 
         sprite.draw(batch);
 
     }
 
-    void destroy(){
+    void destroy() {
         this.remove();
-        Gdx.app.exit();
+        //Gdx.app.exit();
     }
 
-    Rectangle getBoundBox(){
+    Rectangle getBoundBox() {
 
         return boundBox;
     }

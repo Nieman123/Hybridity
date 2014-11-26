@@ -20,7 +20,7 @@ import java.util.Iterator;
  *
  * Basic projectile that can be used by multiple classes and have it's allegience switched.
  */
-public class Bullet extends Actor {
+class Bullet extends Actor {
 
     private Pixmap bulletPixmap;
     private Texture bulletTexture;
@@ -58,6 +58,9 @@ public class Bullet extends Actor {
 
         timeSinceSpawn = 0;
 
+        setWidth(bulletSprite.getWidth());
+        setHeight(bulletSprite.getHeight());
+
     }
 
 
@@ -73,25 +76,6 @@ public class Bullet extends Actor {
 
         }
 
-
-        if(!((Mainland)getStage().getRoot().findActor("ml")).containsPoint((int)(getX()+bulletSprite.getWidth()/2),(int)(getY()+bulletSprite.getHeight()/2))){
-           this.destroy();
-           System.out.println("MISSING");
-
-        }
-
-        Actor[] actors = getStage().getActors().toArray();
-
-
-        for(Actor c : actors){
-            if(c instanceof Seeder){
-                if(Intersector.overlaps(getBounds(), ((Seeder)c).getBounds())){
-                    this.destroy();
-                }
-            }
-        }
-
-
         setPosition((float)(getX()+width),(float)(getY()+height));
 
         bulletSprite.setPosition(getX(),getY());
@@ -103,12 +87,31 @@ public class Bullet extends Actor {
             this.destroy();
         }
 
-        bounds.set(bulletSprite.getBoundingRectangle());
+        int centerX = (int)(getX()+(getWidth()/2));
+        int centerY = (int)(getY()+(getHeight()/2));
 
-    }
 
-    public Rectangle getBounds(){
-        return bulletSprite.getBoundingRectangle();
+
+        Iterator<Actor> actors = getStage().getActors().iterator();
+
+
+
+        if(GameScreen.phase==1){
+            if(!((Mainland)getStage().getRoot().findActor("ml")).containsPoint(centerX,centerY)){
+                this.destroy();
+            }
+        }
+
+        while(actors.hasNext()){
+            Actor c = actors.next();
+            if(c instanceof Seeder){
+                Rectangle seederC = ((Seeder) c).collision;
+                if(Intersector.overlaps(bulletSprite.getBoundingRectangle(), seederC)){
+                    ((Seeder) c).hit();
+                    this.destroy();
+                }
+            }
+        }
     }
 
     public void draw(Batch batch, float parentAlpha) {

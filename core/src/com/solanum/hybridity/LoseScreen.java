@@ -1,33 +1,31 @@
 package com.solanum.hybridity;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * @Aldous
+ * @author Aldous
+ * "Crimewave" - Crystal Castles
+ *
  */
-class TitleScreen implements Screen {
-
+class LoseScreen implements Screen{
     private Texture tex;
     private Sprite sprite;
     private SpriteBatch batch;
-    private Music music;
+    Music music;
     private int h;
     private int w;
 
     private final Hybridity game;
 
-    public TitleScreen(Hybridity session) {
-        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/title.mp3"));
-        tex = new Texture("TitleLogo.png");
+    public LoseScreen(Hybridity session) {
+        tex = new Texture("lose.png");
         sprite = new Sprite(tex);
         h = Gdx.graphics.getHeight();
         w = Gdx.graphics.getWidth();
@@ -37,7 +35,6 @@ class TitleScreen implements Screen {
 
         batch = new SpriteBatch();
 
-        music.setVolume(.5f);
     }
 
     @Override
@@ -48,8 +45,8 @@ class TitleScreen implements Screen {
         sprite.draw(batch);
         batch.end();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            game.setScreen(game.gameScreen);
+        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+            Gdx.app.exit();
         }
     }
 
@@ -61,13 +58,11 @@ class TitleScreen implements Screen {
 
     @Override
     public void show() {
-        music.play();
 
     }
 
     @Override
     public void hide() {
-        music.stop();
 
     }
 
