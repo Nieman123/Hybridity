@@ -1,7 +1,6 @@
 package com.solanum.hybridity;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,43 +14,34 @@ import math.geom2d.polygon.Polygons2D;
 import math.geom2d.polygon.SimplePolygon2D;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 
 /**
  * @author Aldous
- * "You Know I Have To Go" - Royksopp
+ *         "You Know I Have To Go" - Royksopp
  */
 class Seeder extends Actor {
-    private ShapeRenderer render = new ShapeRenderer();
+    public final Rectangle collision = new Rectangle();
+    int speed = 3;
+    private final float[] v = new float[16];
+    private Polygon octagon;
+    private float radius;
+    private float startAngle;
+    private final ShapeRenderer render = new ShapeRenderer();
     private boolean following = true;
-    private Texture tex = new Texture("Wanderer.png");
-    private Sprite sprite = new Sprite(tex);
+    private final Texture tex = new Texture("Wanderer.png");
+    private final Sprite sprite = new Sprite(tex);
     private float timeSinceHit;
     private float getTimeSinceUpdate = 0;
-    private Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-01.wav"));
-    private Sound death = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-03.wav"));
-
-    Polygon octagon;
-    float radius;
-    float startAngle;
-
-    private int gX;
-    private int gY;
-
+    private final Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-01.wav"));
+    private final Sound death = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-03.wav"));
+    private final int gX;
+    private final int gY;
     private int HP = 15;
+    private Mainland ml;
 
-    int speed = 3;
-
-    Rectangle collision = new Rectangle();
-
-    float[] v = new float[16];
-
-    Mainland ml ;
 
 
 
@@ -73,9 +63,8 @@ class Seeder extends Actor {
 
     public void act(float delta) {
         /**
-         * COLLISION CHECK
+         * Checks to see if the seeder is colliding with the Mainland.
          */
-
         if (following) {
             setPosition(getX() - ((getX() - gX) * delta), getY() - ((getY() - gY) * delta));
             if (((Mainland) getStage().getRoot().findActor("ml")).containsPoint((int) (this.getX() + sprite.getWidth() / 2), (int) (this.getY() + sprite.getHeight() / 2))) {
@@ -83,15 +72,17 @@ class Seeder extends Actor {
             }
         }
 
-
+        /**
+         * Keeps track of the last time this seeder was hit by a bullet
+         */
         timeSinceHit += delta;
 
         sprite.setPosition(getX(), getY());
         collision.set(sprite.getBoundingRectangle());
 
-        getTimeSinceUpdate+=delta;
+        getTimeSinceUpdate += delta;
 
-        if (getTimeSinceUpdate>.1 && !following){
+        if (getTimeSinceUpdate > .1 && !following) {
             getTimeSinceUpdate = 0;
             growOctagon();
         }
@@ -101,9 +92,13 @@ class Seeder extends Actor {
 
     public void draw(Batch batch, float parentAlpha) {
 
+        /**
+         * Flashes the seeder whenever it is hit by an enemy laser
+         */
         if (timeSinceHit < .1) {
             sprite.setColor(Color.CYAN);
         }
+
         sprite.draw(batch);
         sprite.setColor(Color.WHITE);
 
@@ -114,30 +109,21 @@ class Seeder extends Actor {
         render.setColor(Color.CYAN);
 
 
-        if(!following && octagon != null){
+        /**
+         * Converts the octagon into a drawable array and passes it to the shape renderer
+         */
+        if (!following && octagon != null) {
 
             int[] x = octagon.xpoints;
             int[] y = octagon.ypoints;
 
-            /**
-             * Fills the verts array with the information from the AWT Polygon object.
-             */
-
-            for( int i = 0; i < 8; i++){
-                v[i*2] = x[i];
-                v[(i*2)+1] = y[i];
+            for (int i = 0; i < 8; i++) {
+                v[i * 2] = x[i];
+                v[(i * 2) + 1] = y[i];
             }
         }
 
-
-        //render.polygon(v);
-
-        if( !following ) {
-            render.setColor(Color.RED);
-            //render.polygon(findIntersect());
-
-        }
-
+        render.polygon(v);
         render.end();
 
 
@@ -145,7 +131,10 @@ class Seeder extends Actor {
 
     }
 
-    public void growOctagon() {
+    /**
+     * Increases the radius of the territorial shape by one and updates the shape
+     */
+    void growOctagon() {
         if (octagon == null) {
             octagon = new Polygon();
             radius = 0;
@@ -172,16 +161,21 @@ class Seeder extends Actor {
 
     }
 
-    public float[] findIntersect(){
+    /**
+     * Identifies the intersect of the Mainland polygon and this seeder's territorial polygon and returns the result
+     *
+     * @return A linear array of floats representing (x, y ,x1 , y1 . . .] in the polygon.
+     */
+    public float[] findIntersect() {
 
-         ml = (Mainland)getStage().getRoot().findActor("ml");
+        ml = getStage().getRoot().findActor("ml");
 
         SimplePolygon2D attackArea = new SimplePolygon2D();
 
         int[] x = octagon.xpoints;
         int[] y = octagon.ypoints;
 
-        for(int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             attackArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
         }
 
@@ -191,7 +185,7 @@ class Seeder extends Actor {
         x = ml.shape.xpoints;
         y = ml.shape.ypoints;
 
-        for(int i = 0; i < ml.shape.npoints; i++){
+        for (int i = 0; i < ml.shape.npoints; i++) {
             mainlandArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
         }
 
@@ -202,7 +196,7 @@ class Seeder extends Actor {
 
         Iterator i = overlap.vertices().iterator();
 
-        while(i.hasNext()){
+        while (i.hasNext()) {
             math.geom2d.Point2D c = (math.geom2d.Point2D) i.next();
 
             overlapArea.add(c.getX());
@@ -211,52 +205,17 @@ class Seeder extends Actor {
 
         float[] returnVerts = new float[overlapArea.size()];
 
-        for(int j = 0; j < returnVerts.length; j++){
-            returnVerts[j] = ((Double)overlapArea.get(j)).intValue();
+        for (int j = 0; j < returnVerts.length; j++) {
+            returnVerts[j] = ((Double) overlapArea.get(j)).intValue();
         }
 
         return returnVerts;
     }
 
     /**
-     * Used to set motherland equal to the difference between this and the motherland overlap area.
+     * Find Difference will remove the overlap of this seeder's territorial polygon and the Mainland polygon
      */
-    public void findDifference(){
-        ml = (Mainland)getStage().getRoot().findActor("ml");
-
-        SimplePolygon2D attackArea = new SimplePolygon2D();
-
-        int[] x = octagon.xpoints;
-        int[] y = octagon.ypoints;
-
-        for(int i = 0; i < 8; i++){
-            attackArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
-        }
-
-
-        SimplePolygon2D mainlandArea = new SimplePolygon2D();
-
-        x = ml.shape.xpoints;
-        y = ml.shape.ypoints;
-
-        for(int i = 0; i < ml.shape.npoints; i++){
-            mainlandArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
-        }
-
-
-        Polygon2D overlap = Polygons2D.intersection(mainlandArea, attackArea);
-
-        Polygon2D diff = Polygons2D.difference(overlap, mainlandArea);
-
-        Polygon difference = new Polygon();
-
-        for( int i = 0; i< diff.vertexNumber(); i++) {
-
-           difference.addPoint((int)diff.vertex(i).getX(), (int)diff.vertex(i).getY());
-        }
-
-        ml.shape= difference;
-
+    void findDifference() {
 
 
     }
