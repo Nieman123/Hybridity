@@ -19,7 +19,7 @@ class GameScreen implements Screen {
     SpriteBatch batch;
     Texture img;
     private Stage gameStage;
-    private int numOfSeeds = 1;
+    private int numOfSeeds = 2;
     private float degreeDivision;
     private Mainland ml;
     private Music music;
@@ -124,7 +124,7 @@ class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        music.stop();
+        //music.stop();
 
     }
 

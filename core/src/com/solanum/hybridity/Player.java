@@ -3,6 +3,8 @@ package com.solanum.hybridity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 
 /**
  * @author Aldous
-   Machinedrum- Vapor City Archives
+   Machinedrum - Vapor City Archives
  */
 class Player extends Actor {
 
@@ -30,6 +32,15 @@ class Player extends Actor {
     private final Texture tex;
     private final Sprite sprite;
     private final Sound laser = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot-03.wav"));
+
+    private float deadZone = .05f;
+
+    private float left_horz;
+    private float left_vert;
+    private float right_horz;
+    private float right_vert;
+
+    Controller controller;
 
     public Player() {
         bullets = new ArrayList();
@@ -46,6 +57,7 @@ class Player extends Actor {
         setWidth(sprite.getWidth());
         setHeight(sprite.getHeight());
 
+        controller = Controllers.getControllers().first();
 
     }
 
@@ -59,24 +71,32 @@ class Player extends Actor {
         float lastX = getX();
         float lastY = getY();
 
+        /**
+         * CONTROLLER MAPPINGS
+         */
+        left_vert = controller.getAxis(2);
+        left_horz = controller.getAxis(3);
+        right_vert = controller.getAxis(0);
+        right_horz = controller.getAxis(1);
+
+
+
         //DIRECTIONAL INPUT
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || left_horz < -0.2) {
             setPosition(getX() - speed, getY());
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || left_vert < -0.2) {
             setPosition(getX(), getY() + speed);
 
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || left_vert > 0.2) {
             setPosition(getX(), getY() - speed);
 
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || left_horz > 0.2) {
             setPosition(getX() + speed, getY());
-
         }
 
-        //ADD BACK ROTATION FUNCTIONS ONCE A SPRITE HAS BEEN ADDED
         if (Gdx.input.isKeyPressed(Input.Keys.J)) {
             sprite.rotate(rotationSpeed);
 
@@ -86,7 +106,8 @@ class Player extends Actor {
             sprite.rotate(-rotationSpeed);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || controller.getButton(5) || controller.getButton(6) || controller.getButton(7) || controller.getButton(8)) {
             if (lastShot > shotDelay) {
                 this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() % 360));
                 laser.play(.1f);
@@ -95,24 +116,24 @@ class Player extends Actor {
         }
 
 
+
+
         /**
-         * CONTROLLER MAPPINGS
+         * RIGHT STICK ROTATIONAL MATH
          */
-/*
-        Controller controller = Controllers.getControllers().first();
+        if(right_horz>deadZone || right_horz<(-1*deadZone) || right_vert > deadZone || right_vert <( -1*deadZone)){
+            rotation = getStickDegree(right_horz, right_vert);
+        }
 
 
-        if(Gdx.input.isButtonPressed(Input.Keys.DPAD_UP)){
-            System.out.println("HIT");
-        }*/
 
+
+        setRotation(rotation);
+        sprite.setRotation(this.getRotation());
 
         if (sprite.getRotation() < 0) {
             sprite.setRotation(360 + sprite.getRotation());
         }
-
-
-        setRotation(rotation);
 
         getStage().getCamera().translate(this.getX() - lastX, this.getY() - lastY, 0);
 
@@ -125,18 +146,29 @@ class Player extends Actor {
             }
         }
 
+
+
+
+
         sprite.setPosition((float) getX(), (float) getY());
+
     }
 
     public void draw(Batch batch, float parentAlpha) {
-
         sprite.draw(batch);
-
     }
 
     void destroy() {
         this.remove();
         //Gdx.app.exit();
+    }
+
+    int getStickDegree(float h, float v){
+        float x = h;
+        float y = -1*v;
+
+        //System.out.println(Math.toDegrees(Math.atan2(y, x)));
+        return (int)(Math.toDegrees(Math.atan2(y, x)));
     }
 
     Rectangle getBoundBox() {

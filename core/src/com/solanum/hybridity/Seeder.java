@@ -25,6 +25,7 @@ class Seeder extends Actor {
     private Texture tex = new Texture("Wanderer.png");
     private Sprite sprite = new Sprite(tex);
     private float timeSinceHit;
+    private float getTimeSinceUpdate = 0;
     private Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-01.wav"));
     private Sound death = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-03.wav"));
 
@@ -79,7 +80,10 @@ class Seeder extends Actor {
         sprite.setPosition(getX(), getY());
         collision.set(sprite.getBoundingRectangle());
 
-        if (Gdx.input.isKeyPressed(Input.Keys.O)) {
+        getTimeSinceUpdate+=delta;
+
+        if (getTimeSinceUpdate>.1 && !following){
+            getTimeSinceUpdate = 0;
             growOctagon();
         }
 
@@ -101,17 +105,18 @@ class Seeder extends Actor {
         render.setColor(Color.CYAN);
 
 
-        if(!following){
+        if(!following && octagon != null){
 
             int[] x = octagon.xpoints;
-            int[] y= octagon.ypoints;
+            int[] y = octagon.ypoints;
 
-            for( int i = 0; i < 16; i++){
-                if(i % 2 == 0 ){
-                    v[i] = x[];
-                } else {
-                    v[i] =
-                }
+            /**
+             * Fills the verts array with the information from the AWT Polygon object.
+             */
+
+            for( int i = 0; i < 8; i++){
+                v[i*2] = x[i];
+                v[(i*2)+1] = y[i];
             }
 
         }
@@ -139,6 +144,8 @@ class Seeder extends Actor {
             radius = 0;
         }
         radius++;
+
+        octagon.reset();
 
         startAngle = 0;
 
