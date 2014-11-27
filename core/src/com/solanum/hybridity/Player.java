@@ -57,7 +57,7 @@ class Player extends Actor {
         setWidth(sprite.getWidth());
         setHeight(sprite.getHeight());
 
-        controller = Controllers.getControllers().first();
+        //controller = Controllers.getControllers().first();
 
     }
 
