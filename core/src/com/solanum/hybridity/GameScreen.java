@@ -4,33 +4,38 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-
-import java.awt.*;
 
 
 /**
  * @author Aldous
+ *
+ * "Splinter Cell Chaos Theory" - Amon Tobin
+ *
+ *
+ * The GameScreen class contains all of the logic which runs the game loop and phases.
+ * It contains a stage, and acts as a top level game manager which will reset the game,
+ *  handle enemy instantiations and can be reset if necessary in order to start a new round.
+ *
+ *  Conceptually, it can best be compared the board for a boardgame which can be reset and repurposed.
  */
 
 class GameScreen implements Screen {
-    private Hybridity game;
-    SpriteBatch batch;
-    Texture img;
-    private Stage gameStage;
-    private int numOfSeeds = 0;
-    private float degreeDivision;
-    private Mainland ml;
-    private Music music;
+
+
     public static int phase = 1;
+    private final Hybridity game;
+    private final Stage gameStage;
+    private final Mainland ml;
+    private final int numOfSeeds  = 0;
 
-    private boolean playerActive = false;
 
-
-
+    /**
+     *
+     * @param session A reference to the over all GDX Game class so that it can refer back to itself and change the
+     *                current screen (Such as a gameOver or optionsScreen).
+     */
     GameScreen(Hybridity session) {
         game = session;
         gameStage = new Stage();
@@ -41,8 +46,11 @@ class GameScreen implements Screen {
         gameStage.addActor(player);
 
 
-        if(numOfSeeds>0){
-            degreeDivision = 360 / numOfSeeds;
+        /**
+         * Divides a 360 degree circle by the amount of specified enemies and then stargt
+         */
+        if (numOfSeeds > 0) {
+            float degreeDivision = 360 / numOfSeeds;
 
             for (int i = 1; i <= numOfSeeds; i++) {
                 plantSeed(i * degreeDivision, 900 * i);
@@ -50,14 +58,17 @@ class GameScreen implements Screen {
         }
 
 
-
-
-        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
+        Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
         music.setVolume(.5f);
 
     }
 
 
+    /**
+     * Places a Seed enem
+     * @param angle
+     * @param distance
+     */
     void plantSeed(float angle, float distance) {
 
         angle = angle % 360;
@@ -105,7 +116,7 @@ class GameScreen implements Screen {
         gameStage.act();
         gameStage.draw();
 
-        playerActive = false;
+        boolean playerActive = false;
         for (Actor c : gameStage.getActors()) {
             if (c instanceof Player)
                 playerActive = true;
