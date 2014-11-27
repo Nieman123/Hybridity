@@ -40,7 +40,7 @@ class SplashScreen implements Screen {
         Gdx.graphics.getGL20().glClearColor(1,1,1,1);
         Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
         if(sliding){
-            splash.translate(0, -150 * delta);
+            splash.translate(0, -180 * delta);
             if(splash.getY()<Gdx.graphics.getHeight()/2-splash.getHeight()/2){
                 sliding=false;
                 chime.play();

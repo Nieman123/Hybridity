@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import java.awt.*;
+
 
 /**
  * @author Aldous
@@ -19,13 +21,14 @@ class GameScreen implements Screen {
     SpriteBatch batch;
     Texture img;
     private Stage gameStage;
-    private int numOfSeeds = 2;
+    private int numOfSeeds = 360;
     private float degreeDivision;
     private Mainland ml;
     private Music music;
     public static int phase = 1;
 
     private boolean playerActive = false;
+
 
 
     GameScreen(Hybridity session) {
@@ -89,6 +92,10 @@ class GameScreen implements Screen {
         gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY));
 
 
+
+
+
+
     }
 
     @Override
@@ -118,13 +125,13 @@ class GameScreen implements Screen {
 
     @Override
     public void show() {
-        //music.play();
+        music.play();
 
     }
 
     @Override
     public void hide() {
-        //music.stop();
+        music.stop();
 
     }
 
@@ -135,7 +142,7 @@ class GameScreen implements Screen {
 
     @Override
     public void resume() {
-        //music.play();
+        music.play();
 
     }
 
