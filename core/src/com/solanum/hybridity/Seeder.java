@@ -10,9 +10,16 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import math.geom2d.polygon.Polygon2D;
+import math.geom2d.polygon.Polygons2D;
+import math.geom2d.polygon.SimplePolygon2D;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -45,6 +52,7 @@ class Seeder extends Actor {
     float[] v = new float[16];
 
 
+
     Seeder(float x, float y, int goalX, int goalY) {
         sprite.setOrigin(x, y);
 
@@ -57,7 +65,6 @@ class Seeder extends Actor {
         setOrigin(getX() + getHeight() / 2, getY() + getWidth() / 2);
 
         collision.set(sprite.getBoundingRectangle());
-
 
     }
 
@@ -118,25 +125,23 @@ class Seeder extends Actor {
                 v[i*2] = x[i];
                 v[(i*2)+1] = y[i];
             }
-
         }
 
 
-        render.polygon(v);
+        //render.polygon(v);
+
+        if( !following ) {
+            render.setColor(Color.RED);
+            render.polygon(findIntersect());
+
+        }
+
         render.end();
 
 
         batch.begin();
 
     }
-
-
-    /*angle = start_angle
-            angle_increment = 360 / n_sides
-    for n_sides:
-    x = x_centre + radius * cos(angle)
-    y = y_centre + radius * sin(angle)
-    angle += angle_increment*/
 
     public void growOctagon() {
         if (octagon == null) {
@@ -161,7 +166,52 @@ class Seeder extends Actor {
             startAngle += 360 / 8;
         }
 
+    }
 
+    public float[] findIntersect(){
+
+        Mainland ml = (Mainland)getStage().getRoot().findActor("ml");
+
+        SimplePolygon2D attackArea = new SimplePolygon2D();
+
+        int[] x = octagon.xpoints;
+        int[] y = octagon.ypoints;
+
+        for(int i = 0; i < 8; i++){
+            attackArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
+        }
+
+
+        SimplePolygon2D mainlandArea = new SimplePolygon2D();
+
+        x = ml.shape.xpoints;
+        y = ml.shape.ypoints;
+
+        for(int i = 0; i < ml.shape.npoints; i++){
+            mainlandArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
+        }
+
+
+        Polygon2D overlap = Polygons2D.intersection(mainlandArea, attackArea);
+
+        ArrayList overlapArea = new ArrayList();
+
+        Iterator i = overlap.vertices().iterator();
+
+        while(i.hasNext()){
+            math.geom2d.Point2D c = (math.geom2d.Point2D) i.next();
+
+            overlapArea.add(c.getX());
+            overlapArea.add(c.getY());
+        }
+
+        float[] returnVerts = new float[overlapArea.size()];
+
+        for(int j = 0; j < returnVerts.length; j++){
+            returnVerts[j] = ((Double)overlapArea.get(j)).intValue();
+        }
+
+        return returnVerts;
     }
 
     public void hit() {

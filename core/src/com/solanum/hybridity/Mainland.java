@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import math.geom2d.polygon.SimplePolygon2D;
 
 import java.awt.geom.Point2D.Float;
 
@@ -22,7 +23,7 @@ class Mainland extends Actor {
     private float[] v;
     public int oX;
     public int oY;
-    Polygon shape;
+    public Polygon shape;
 
     public Mainland(int x, int y) {
         render = new ShapeRenderer();
@@ -42,6 +43,12 @@ class Mainland extends Actor {
 
         this.setName("ml");
 
+        shape = new Polygon();
+
+        for (int i = 0; i < verts.size(); i++) {
+            shape.addPoint((int) verts.get(i).getX(), (int) verts.get(i).getY());
+        }
+
     }
 
     public void act(float delta) {
@@ -54,6 +61,9 @@ class Mainland extends Actor {
         for (int i = 0; i < verts.size(); i++) {
             shape.addPoint((int) verts.get(i).getX(), (int) verts.get(i).getY());
         }
+
+
+        SimplePolygon2D test = new SimplePolygon2D();
 
         return shape.contains(x, y);
     }

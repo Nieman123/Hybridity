@@ -121,15 +121,12 @@ class Player extends Actor {
         /**
          * RIGHT STICK ROTATIONAL MATH
          */
-        if(right_horz>deadZone || right_horz<(-1*deadZone) || right_vert > deadZone || right_vert <( -1*deadZone)){
+        /*if(right_horz>deadZone || right_horz<(-1*deadZone) || right_vert > deadZone || right_vert <( -1*deadZone)){
             rotation = getStickDegree(right_horz, right_vert);
-        }
+            setRotation(rotation);
+            sprite.setRotation(this.getRotation());
+        }*/
 
-
-
-
-        setRotation(rotation);
-        sprite.setRotation(this.getRotation());
 
         if (sprite.getRotation() < 0) {
             sprite.setRotation(360 + sprite.getRotation());
@@ -145,9 +142,6 @@ class Player extends Actor {
                 this.destroy();
             }
         }
-
-
-
 
 
         sprite.setPosition((float) getX(), (float) getY());

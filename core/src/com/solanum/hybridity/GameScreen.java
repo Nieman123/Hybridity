@@ -21,7 +21,7 @@ class GameScreen implements Screen {
     SpriteBatch batch;
     Texture img;
     private Stage gameStage;
-    private int numOfSeeds = 360;
+    private int numOfSeeds = 3;
     private float degreeDivision;
     private Mainland ml;
     private Music music;
@@ -92,10 +92,6 @@ class GameScreen implements Screen {
         gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY));
 
 
-
-
-
-
     }
 
     @Override
@@ -125,24 +121,24 @@ class GameScreen implements Screen {
 
     @Override
     public void show() {
-        music.play();
+        //music.play();
 
     }
 
     @Override
     public void hide() {
-        music.stop();
+        //music.stop();
 
     }
 
     @Override
     public void pause() {
-        music.pause();
+        //music.pause();
     }
 
     @Override
     public void resume() {
-        music.play();
+        //music.play();
 
     }
 
