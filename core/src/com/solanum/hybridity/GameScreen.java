@@ -21,7 +21,7 @@ class GameScreen implements Screen {
     SpriteBatch batch;
     Texture img;
     private Stage gameStage;
-    private int numOfSeeds = 3;
+    private int numOfSeeds = 0;
     private float degreeDivision;
     private Mainland ml;
     private Music music;
@@ -40,12 +40,16 @@ class GameScreen implements Screen {
         gameStage.addActor(ml);
         gameStage.addActor(player);
 
-        degreeDivision = 360 / numOfSeeds;
 
+        if(numOfSeeds>0){
+            degreeDivision = 360 / numOfSeeds;
 
-        for (int i = 1; i <= numOfSeeds; i++) {
-            plantSeed(i * degreeDivision, 900 * i);
+            for (int i = 1; i <= numOfSeeds; i++) {
+                plantSeed(i * degreeDivision, 900 * i);
+            }
         }
+
+
 
 
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));

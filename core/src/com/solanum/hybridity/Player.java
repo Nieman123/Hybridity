@@ -74,26 +74,62 @@ class Player extends Actor {
         /**
          * CONTROLLER MAPPINGS
          */
-        left_vert = controller.getAxis(2);
-        left_horz = controller.getAxis(3);
-        right_vert = controller.getAxis(0);
-        right_horz = controller.getAxis(1);
+        if(Controllers.getControllers().size!=0)
+        {
+            left_vert = controller.getAxis(2);
+            left_horz = controller.getAxis(3);
+            right_vert = controller.getAxis(0);
+            right_horz = controller.getAxis(1);
+
+            //DIRECTIONAL INPUT
+            if (left_horz < -0.2) {
+                setPosition(getX() - speed, getY());
+            }
+            if (left_vert < -0.2) {
+                setPosition(getX(), getY() + speed);
+
+            }
+            if (left_vert > 0.2) {
+                setPosition(getX(), getY() - speed);
+
+            }
+            if (left_horz > 0.2) {
+                setPosition(getX() + speed, getY());
+            }
+
+            if (controller.getButton(5) || controller.getButton(6) || controller.getButton(7) || controller.getButton(8)) {
+                if (lastShot > shotDelay) {
+                    this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() % 360));
+                    laser.play(.1f);
+                    lastShot = 0;
+                }
+            }
+
+            if(right_horz>deadZone || right_horz<(-1*deadZone) || right_vert > deadZone || right_vert <( -1*deadZone)){
+                rotation = getStickDegree(right_horz, right_vert);
+                setRotation(rotation);
+                sprite.setRotation(this.getRotation());
+            }
+
+
+        }
+
 
 
 
         //DIRECTIONAL INPUT
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || left_horz < -0.2) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             setPosition(getX() - speed, getY());
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || left_vert < -0.2) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             setPosition(getX(), getY() + speed);
 
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || left_vert > 0.2) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S) ) {
             setPosition(getX(), getY() - speed);
 
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || left_horz > 0.2) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D) ) {
             setPosition(getX() + speed, getY());
         }
 
@@ -107,25 +143,13 @@ class Player extends Actor {
         }
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || controller.getButton(5) || controller.getButton(6) || controller.getButton(7) || controller.getButton(8)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (lastShot > shotDelay) {
                 this.getParent().addActor(new Bullet(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2, sprite.getRotation() % 360));
                 laser.play(.1f);
                 lastShot = 0;
             }
         }
-
-
-
-
-        /**
-         * RIGHT STICK ROTATIONAL MATH
-         */
-        /*if(right_horz>deadZone || right_horz<(-1*deadZone) || right_vert > deadZone || right_vert <( -1*deadZone)){
-            rotation = getStickDegree(right_horz, right_vert);
-            setRotation(rotation);
-            sprite.setRotation(this.getRotation());
-        }*/
 
 
         if (sprite.getRotation() < 0) {
