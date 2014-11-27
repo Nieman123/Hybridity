@@ -51,6 +51,8 @@ class Seeder extends Actor {
 
     float[] v = new float[16];
 
+    Mainland ml ;
+
 
 
     Seeder(float x, float y, int goalX, int goalY) {
@@ -132,7 +134,7 @@ class Seeder extends Actor {
 
         if( !following ) {
             render.setColor(Color.RED);
-            render.polygon(findIntersect());
+            //render.polygon(findIntersect());
 
         }
 
@@ -166,11 +168,13 @@ class Seeder extends Actor {
             startAngle += 360 / 8;
         }
 
+        findDifference();
+
     }
 
     public float[] findIntersect(){
 
-        Mainland ml = (Mainland)getStage().getRoot().findActor("ml");
+         ml = (Mainland)getStage().getRoot().findActor("ml");
 
         SimplePolygon2D attackArea = new SimplePolygon2D();
 
@@ -212,6 +216,49 @@ class Seeder extends Actor {
         }
 
         return returnVerts;
+    }
+
+    /**
+     * Used to set motherland equal to the difference between this and the motherland overlap area.
+     */
+    public void findDifference(){
+        ml = (Mainland)getStage().getRoot().findActor("ml");
+
+        SimplePolygon2D attackArea = new SimplePolygon2D();
+
+        int[] x = octagon.xpoints;
+        int[] y = octagon.ypoints;
+
+        for(int i = 0; i < 8; i++){
+            attackArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
+        }
+
+
+        SimplePolygon2D mainlandArea = new SimplePolygon2D();
+
+        x = ml.shape.xpoints;
+        y = ml.shape.ypoints;
+
+        for(int i = 0; i < ml.shape.npoints; i++){
+            mainlandArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
+        }
+
+
+        Polygon2D overlap = Polygons2D.intersection(mainlandArea, attackArea);
+
+        Polygon2D diff = Polygons2D.difference(overlap, mainlandArea);
+
+        Polygon difference = new Polygon();
+
+        for( int i = 0; i< diff.vertexNumber(); i++) {
+
+           difference.addPoint((int)diff.vertex(i).getX(), (int)diff.vertex(i).getY());
+        }
+
+        ml.shape= difference;
+
+
+
     }
 
     public void hit() {
