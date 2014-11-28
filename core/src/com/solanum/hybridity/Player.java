@@ -17,20 +17,23 @@ import java.util.ArrayList;
 
 /**
  * @author Aldous
-   Machinedrum - Vapor City Archives
+ * Machinedrum - Vapor City Archives
+ *
+ * The Player class is an Actor representating the player inside of the GameBoard that listens for input from the keyboard
+ * and controller.
+ *
+ * It updates and translates the camera according to payer movement
  */
 class Player extends Actor {
 
-    private float speed = 8;
     private final ArrayList bullets;
+    private float speed = 8;
     private float rotation;
-    private final float shotDelay;
     private float lastShot;
-    private final float rotationSpeed;
-    private OrthographicCamera cam;
-    private final Rectangle boundBox = null;
-    private final Texture tex;
-    private final Sprite sprite;
+    private final float shotDelay = .1025f;;
+    private final float rotationSpeed = 6;
+    private final Texture tex = new Texture("Player.png");
+    private final Sprite sprite = new Sprite(tex);
     private final Sound laser = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot-03.wav"));
 
     private float deadZone = .05f;
@@ -43,13 +46,10 @@ class Player extends Actor {
     Controller controller;
 
     public Player() {
-        bullets = new ArrayList();
-        shotDelay = .1025f;
-        lastShot = 0;
-        rotationSpeed = 6;
 
-        tex = new Texture("Player.png");
-        sprite = new Sprite(tex);
+        bullets = new ArrayList();
+        lastShot = 0;
+
         sprite.setPosition(0, 0);
         setX(Gdx.graphics.getWidth() / 2);
         setY(Gdx.graphics.getHeight() / 2);
@@ -57,22 +57,41 @@ class Player extends Actor {
         setWidth(sprite.getWidth());
         setHeight(sprite.getHeight());
 
-        //controller = Controllers.getControllers().first();
+
+        /**
+         * Controller API checks for the presence of controllers. If any are found, the first one is mapped to the
+         * 'controller' variable. If not, nothing ocurs.
+         */
+        if(Controllers.getControllers().size != 0) {
+            controller = Controllers.getControllers().first();
+        }
 
     }
 
+    /**
+     * Contains all of the logic that is to be fired each tick of the game. Is called by the Stage instance that this
+     * Actor is a part of.
+     * @param delta The elapsed time since this function has last been called. Used for animating and speed calculating
+     *              purpises.
+     */
     public void act(float delta) {
 
-        getStage().getActors();
-        //LAST SHOT FIRED
+        /**
+         * Keeps track of the last time that a bullet was fired by this player.
+         */
         lastShot += delta;
 
-        //KEEPS TRACK OF LAST COORDINATES FOR OUT OF BOUNDS RESETTING AND CAMERA UPDATES
+
+        /**
+         * Saves the current position of the actor before any manipulations are made. This is done in case the Actor
+         * is moved to an invalid position and needs to be reset mid-frame.
+         */
         float lastX = getX();
         float lastY = getY();
 
         /**
-         * CONTROLLER MAPPINGS
+         * Contains all of the logic related to playing the game using a controller. If the Controller API included
+         * with LibGDX doesn't detect any active controllers, than non of these will fire.
          */
         if(Controllers.getControllers().size!=0)
         {
@@ -172,25 +191,35 @@ class Player extends Actor {
 
     }
 
+    /**
+     * Uses information about the current graphics state to draw the assets associated with this class
+     * @param batch An instance of a sprite batch, which is an object containing information about the current
+     *              OpenGL graphics state and is queried by the entity being drawn.
+     * @param parentAlpha The alpha value of the immediate ascendant of this actor.
+     */
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
     }
 
+    /**
+     * Called to remove this entity from the stage
+     */
     void destroy() {
         this.remove();
         //Gdx.app.exit();
     }
 
+    /**
+     * Takes current information about a joystick's position and return a degree of it's position relative to it's center.
+     * @param h The raw float value for the stick's horizontal axis
+     * @param v The raw float value for the stick's vertical acis
+     * @return The integer representation of the degree position of the x axis
+     */
     int getStickDegree(float h, float v){
         float x = h;
         float y = -1*v;
 
-        //System.out.println(Math.toDegrees(Math.atan2(y, x)));
         return (int)(Math.toDegrees(Math.atan2(y, x)));
     }
 
-    Rectangle getBoundBox() {
-
-        return boundBox;
-    }
 }
