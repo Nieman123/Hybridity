@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import math.geom2d.Point2D;
 import math.geom2d.polygon.Polygon2D;
 import math.geom2d.polygon.Polygons2D;
 import math.geom2d.polygon.SimplePolygon2D;
@@ -21,28 +22,30 @@ import java.util.Iterator;
 /**
  * @author Aldous
  *         "You Know I Have To Go" - Royksopp
+ *         <p/>
+ *         The Seeder class represents an enemy that is spawned outside the perimeter of the Mainland, move towards it's
+ *         origin and then latches on to the outside of the perimeter. Once it has latched onto the outside of the Mainland,
+ *         it will begin expanding in an octoganal shape and claiming territory inside of the Mainland.
  */
 class Seeder extends Actor {
     public final Rectangle collision = new Rectangle();
-    int speed = 3;
     private final float[] v = new float[16];
-    private Polygon octagon;
-    private float radius;
-    private float startAngle;
     private final ShapeRenderer render = new ShapeRenderer();
-    private boolean following = true;
     private final Texture tex = new Texture("Wanderer.png");
     private final Sprite sprite = new Sprite(tex);
-    private float timeSinceHit;
-    private float getTimeSinceUpdate = 0;
     private final Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-01.wav"));
     private final Sound death = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-03.wav"));
     private final int gX;
     private final int gY;
+    int speed = 3;
+    private SimplePolygon2D octagon;
+    private float radius;
+    private float startAngle;
+    private boolean following = true;
+    private float timeSinceHit;
+    private float getTimeSinceUpdate = 0;
     private int HP = 15;
     private Mainland ml;
-
-
 
 
     Seeder(float x, float y, int goalX, int goalY) {
@@ -110,16 +113,13 @@ class Seeder extends Actor {
 
 
         /**
-         * Converts the octagon into a drawable array and passes it to the shape renderer
+         * Converts the octagon into a simplistic, drawable array and passes it to the shape renderer
          */
         if (!following && octagon != null) {
 
-            int[] x = octagon.xpoints;
-            int[] y = octagon.ypoints;
-
             for (int i = 0; i < 8; i++) {
-                v[i * 2] = x[i];
-                v[(i * 2) + 1] = y[i];
+                v[i * 2] = (float) octagon.vertex(i).x();
+                v[(i * 2) + 1] = (float) octagon.vertex(i).y();
             }
         }
 
@@ -136,12 +136,12 @@ class Seeder extends Actor {
      */
     void growOctagon() {
         if (octagon == null) {
-            octagon = new Polygon();
+            octagon = new SimplePolygon2D();
             radius = 0;
         }
         radius++;
 
-        octagon.reset();
+        octagon.clearVertices();
 
         startAngle = 0;
 
@@ -152,12 +152,11 @@ class Seeder extends Actor {
             x = (float) ((getX() + sprite.getWidth() / 2) + radius * Math.cos(Math.toRadians(startAngle)));
             y = (float) ((getY() + sprite.getHeight() / 2) + radius * Math.sin(Math.toRadians(startAngle)));
 
-            octagon.addPoint((int) x, (int) y);
+            octagon.addVertex(new Point2D( x, y));
 
             startAngle += 360 / 8;
         }
 
-        findDifference();
 
     }
 
@@ -170,46 +169,11 @@ class Seeder extends Actor {
 
         ml = getStage().getRoot().findActor("ml");
 
-        SimplePolygon2D attackArea = new SimplePolygon2D();
-
-        int[] x = octagon.xpoints;
-        int[] y = octagon.ypoints;
-
-        for (int i = 0; i < 8; i++) {
-            attackArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
-        }
 
 
-        SimplePolygon2D mainlandArea = new SimplePolygon2D();
-
-        x = ml.shape.xpoints;
-        y = ml.shape.ypoints;
-
-        for (int i = 0; i < ml.shape.npoints; i++) {
-            mainlandArea.addVertex(new math.geom2d.Point2D(x[i], y[i]));
-        }
 
 
-        Polygon2D overlap = Polygons2D.intersection(mainlandArea, attackArea);
-
-        ArrayList overlapArea = new ArrayList();
-
-        Iterator i = overlap.vertices().iterator();
-
-        while (i.hasNext()) {
-            math.geom2d.Point2D c = (math.geom2d.Point2D) i.next();
-
-            overlapArea.add(c.getX());
-            overlapArea.add(c.getY());
-        }
-
-        float[] returnVerts = new float[overlapArea.size()];
-
-        for (int j = 0; j < returnVerts.length; j++) {
-            returnVerts[j] = ((Double) overlapArea.get(j)).intValue();
-        }
-
-        return returnVerts;
+        return new float[]{0f};
     }
 
     /**

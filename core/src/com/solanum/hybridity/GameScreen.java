@@ -10,15 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 /**
  * @author Aldous
- *
- * "Splinter Cell Chaos Theory" - Amon Tobin
- *
- *
- * The GameScreen class contains all of the logic which runs the game loop and phases.
- * It contains a stage, and acts as a top level game manager which will reset the game,
- *  handle enemy instantiations and can be reset if necessary in order to start a new round.
- *
- *  Conceptually, it can best be compared the board for a boardgame which can be reset and repurposed.
+ *         <p/>
+ *         "Splinter Cell Chaos Theory" - Amon Tobin
+ *         <p/>
+ *         <p/>
+ *         The GameScreen class contains all of the logic which runs the game loop and phases.
+ *         It contains a stage, and acts as a top level game manager which will reset the game,
+ *         handle enemy instantiations and can be reset if necessary in order to start a new round.
+ *         <p/>
+ *         Conceptually, it can best be compared the board for a boardgame which can be reset and repurposed.
  */
 
 class GameScreen implements Screen {
@@ -28,11 +28,11 @@ class GameScreen implements Screen {
     private final Hybridity game;
     private final Stage gameStage;
     private final Mainland ml;
-    private final int numOfSeeds  = 0;
+    private final int numOfSeeds = 1;
+    private final Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
 
 
     /**
-     *
      * @param session A reference to the over all GDX Game class so that it can refer back to itself and change the
      *                current screen (Such as a gameOver or optionsScreen).
      */
@@ -58,14 +58,18 @@ class GameScreen implements Screen {
         }
 
 
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
+        /**
+         * Sets the music at half volume for levelling purposes.
+         */
         music.setVolume(.5f);
 
     }
 
 
     /**
-     * Places a Seed enem
+     * Places a Seeder at the specified angle relative to the origin of the Mainland and at the specified distance
+     * away from the Mainland.
+     *
      * @param angle
      * @param distance
      */
@@ -116,6 +120,9 @@ class GameScreen implements Screen {
         gameStage.act();
         gameStage.draw();
 
+        /**
+         * Scans through all of the Actors to determine if there's is still one play.
+         */
         boolean playerActive = false;
         for (Actor c : gameStage.getActors()) {
             if (c instanceof Player)

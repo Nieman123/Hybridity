@@ -11,18 +11,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * @author Aldous
- * "Crimewave" - Crystal Castles
- *
+ *         "Crimewave" - Crystal Castles
+ *         <p/>
+ *         The lose screen contains the graphics and music to be displayed whenever the game is lost.
+ *         <p/>
+ *         It implements the Screen interface and contains a reference to the over all game variable so that it can change
+ *         it's current screen, such as if the player decided they wanted to start a new game.
  */
-class LoseScreen implements Screen{
+class LoseScreen implements Screen {
+    private final Hybridity game;
+    Music music;
     private Texture tex;
     private Sprite sprite;
     private SpriteBatch batch;
-    Music music;
     private int h;
     private int w;
-
-    private final Hybridity game;
 
     public LoseScreen(Hybridity session) {
         tex = new Texture("lose.png");
@@ -30,7 +33,7 @@ class LoseScreen implements Screen{
         h = Gdx.graphics.getHeight();
         w = Gdx.graphics.getWidth();
 
-        sprite.setPosition(w/2-sprite.getWidth()/2, (h/2)-sprite.getHeight()/2);
+        sprite.setPosition(w / 2 - sprite.getWidth() / 2, (h / 2) - sprite.getHeight() / 2);
         game = session;
 
         batch = new SpriteBatch();
@@ -45,15 +48,15 @@ class LoseScreen implements Screen{
         sprite.draw(batch);
         batch.end();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
     }
 
     @Override
     public void resize(int width, int height) {
-        w =width;
-        h =height;
+        w = width;
+        h = height;
     }
 
     @Override

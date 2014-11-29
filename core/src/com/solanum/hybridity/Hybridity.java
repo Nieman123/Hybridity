@@ -5,6 +5,8 @@ import com.badlogic.gdx.Screen;
 
 /**
  * @author Aldous
+ *
+ * Top level entry point into the game loop that is started by the platform launcher.
  */
 public class Hybridity extends Game {
     private Screen splashScreen;

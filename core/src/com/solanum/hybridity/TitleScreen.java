@@ -1,21 +1,22 @@
 package com.solanum.hybridity;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * @Aldous
+ * @Aldous The TitleScreen is an implementation of the Screen interface and acts as an interchange for other screens to
+ * be set as active. It listens for input from the space bar and starts the game.
  */
+
 class TitleScreen implements Screen {
 
+    private final Hybridity game;
     private Texture tex;
     private Sprite sprite;
     private SpriteBatch batch;
@@ -23,16 +24,20 @@ class TitleScreen implements Screen {
     private int h;
     private int w;
 
-    private final Hybridity game;
-
+    /**
+     * Instantiates the music and art for the screen and maintains a reference to the
+     *
+     * @param session
+     */
     public TitleScreen(Hybridity session) {
+
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/title.mp3"));
         tex = new Texture("TitleLogo.png");
         sprite = new Sprite(tex);
         h = Gdx.graphics.getHeight();
         w = Gdx.graphics.getWidth();
 
-        sprite.setPosition(w/2-sprite.getWidth()/2, (h/2)-sprite.getHeight()/2);
+        sprite.setPosition(w / 2 - sprite.getWidth() / 2, (h / 2) - sprite.getHeight() / 2);
         game = session;
 
         batch = new SpriteBatch();
@@ -48,15 +53,23 @@ class TitleScreen implements Screen {
         sprite.draw(batch);
         batch.end();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+        /**
+         * Listens for input from the Space bar and starts the game
+         */
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             game.setScreen(game.gameScreen);
         }
     }
 
+    /**
+     * All methods below are mandated by the Screen interface and are called when the GDX application experiences
+     * certain criteria or state changes.
+     */
+
     @Override
     public void resize(int width, int height) {
-        w =width;
-        h =height;
+        w = width;
+        h = height;
     }
 
     @Override
