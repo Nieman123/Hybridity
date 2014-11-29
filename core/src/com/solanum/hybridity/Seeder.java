@@ -1,6 +1,7 @@
 package com.solanum.hybridity;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,9 +28,9 @@ import java.util.Iterator;
  *         origin and then latches on to the outside of the perimeter. Once it has latched onto the outside of the Mainland,
  *         it will begin expanding in an octoganal shape and claiming territory inside of the Mainland.
  */
-class Seeder extends Actor {
+public class Seeder extends Actor {
     public final Rectangle collision = new Rectangle();
-    private final float[] v = new float[16];
+    private float[] v;
     private final ShapeRenderer render = new ShapeRenderer();
     private final Texture tex = new Texture("Wanderer.png");
     private final Sprite sprite = new Sprite(tex);
@@ -39,6 +40,8 @@ class Seeder extends Actor {
     private final int gY;
     int speed = 3;
     private SimplePolygon2D octagon;
+    private SimplePolygon2D territory;
+    private SimplePolygon2D originalMainland;
     private float radius;
     private float startAngle;
     private boolean following = true;
@@ -48,7 +51,14 @@ class Seeder extends Actor {
     private Mainland ml;
 
 
-    Seeder(float x, float y, int goalX, int goalY) {
+    /**
+     * Creates a basic Seeder enemy that is spawned at a specified x and y and given an origin x and y to follow.
+     * @param x The x coordinate of the point that the seeder will be spawned at
+     * @param y The y coordinate of the point that the seeder will be spawned at
+     * @param goalX The x coordinate of the point that the seeder will follow
+     * @param goalY The y coordinate of the point that the seeder will follow
+     */
+    Seeder(float x, float y, int goalX, int goalY, Mainland goal) {
         sprite.setOrigin(x, y);
 
         gX = goalX;
@@ -61,6 +71,9 @@ class Seeder extends Actor {
 
         collision.set(sprite.getBoundingRectangle());
 
+        originalMainland = goal.area;
+
+        territory = new SimplePolygon2D();
     }
 
 
@@ -90,6 +103,13 @@ class Seeder extends Actor {
             growOctagon();
         }
 
+        if(Gdx.input.isButtonPressed(Input.Keys.E)) {
+            updateMainland();
+        }
+
+
+
+
     }
 
 
@@ -115,24 +135,27 @@ class Seeder extends Actor {
         /**
          * Converts the octagon into a simplistic, drawable array and passes it to the shape renderer
          */
+
         if (!following && octagon != null) {
 
-            for (int i = 0; i < 8; i++) {
-                v[i * 2] = (float) octagon.vertex(i).x();
-                v[(i * 2) + 1] = (float) octagon.vertex(i).y();
+            v = new float[territory.vertexNumber()*2];
+            for (int i = 0; i < territory.vertexNumber(); i++) {
+                v[i * 2] = (float) territory.vertex(i).x();
+                v[(i * 2) + 1] = (float) territory.vertex(i).y();
             }
+
+           render.polygon(findIntersect());
         }
 
-        render.polygon(v);
         render.end();
-
-
         batch.begin();
 
     }
 
     /**
-     * Increases the radius of the territorial shape by one and updates the shape
+     * Increases the radius of the territorial shape by one and updates the shape. This shape is to be considered pure.
+     * Meaning that it is, in essence, an Octagon. Calculations related to overlap and intersections are perfomed
+     * elsewhere.
      */
     void growOctagon() {
         if (octagon == null) {
@@ -169,18 +192,44 @@ class Seeder extends Actor {
 
         ml = getStage().getRoot().findActor("ml");
 
+        Polygon2D overlap = Polygons2D.intersection(originalMainland, octagon);
+
+        territory.clearVertices();
+        for(int i = 0; i < overlap.vertexNumber(); i++) {
+
+            territory.addVertex(new Point2D(overlap.vertex(i).x() , overlap.vertex(i).y()));
+        }
+
+        float[] intersect = new float[overlap.vertexNumber()*2];
+
+        for( int i = 0; i < overlap.vertexNumber(); i++ ) {
+
+            intersect[i * 2 ] = (float )overlap.vertex(i).x();
+            intersect[(i * 2 ) + 1] = (float )overlap.vertex(i).y();
+
+        }
 
 
-
-
-        return new float[]{0f};
+        return intersect;
     }
 
     /**
      * Find Difference will remove the overlap of this seeder's territorial polygon and the Mainland polygon
      */
-    void findDifference() {
+    public void updateMainland() {
 
+        ml = getStage().getRoot().findActor("ml");
+
+        SimplePolygon2D newArea = new SimplePolygon2D();
+
+        Polygon2D eOr  =  Polygons2D.exclusiveOr(territory, ml.area);
+
+        for(int i = 0; i < eOr.vertexNumber(); i++) {
+
+            newArea.addVertex(new Point2D(eOr.vertex(i).x() , eOr.vertex(i).y()));
+        }
+
+        ml.area = newArea;
 
     }
 

@@ -18,7 +18,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  *         It implements the Screen interface and contains a reference to the over all game variable so that it can change
  *         it's current screen, such as if the player decided they wanted to start a new game.
  */
-class LoseScreen implements Screen {
+public class LoseScreen implements Screen {
     private final Hybridity game;
     Music music;
     private Texture tex;

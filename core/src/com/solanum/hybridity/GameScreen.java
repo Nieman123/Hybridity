@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
  *         Conceptually, it can best be compared the board for a boardgame which can be reset and repurposed.
  */
 
-class GameScreen implements Screen {
+public class GameScreen implements Screen {
 
 
     public static int phase = 1;
@@ -108,7 +108,7 @@ class GameScreen implements Screen {
             }
         }
 
-        gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY));
+        gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY, ml));
 
 
     }

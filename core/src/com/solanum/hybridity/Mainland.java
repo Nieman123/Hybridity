@@ -17,7 +17,7 @@ import math.geom2d.polygon.SimplePolygon2D;
  *         <p/>
  *         Leaving the Mainland during phase one will result in an instant death on behalf of the Player.
  */
-class Mainland extends Actor {
+public class Mainland extends Actor {
     private ShapeRenderer render = new ShapeRenderer();
     private float[] v;
     public int oX;

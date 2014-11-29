@@ -16,7 +16,7 @@ import java.util.Iterator;
  *         <p/>
  *         Basic projectile that can be used by multiple classes and have it's allegience switched.
  */
-class Bullet extends Actor {
+public class Bullet extends Actor {
 
     private final Sprite bulletSprite;
     private final double speed;

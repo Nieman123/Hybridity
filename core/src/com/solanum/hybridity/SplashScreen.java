@@ -9,9 +9,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * @Aldous
+ * @author Aldous
+ *
+ * Contains logic and graphics needed to display the splash screen.
  */
-class SplashScreen implements Screen {
+public class SplashScreen implements Screen {
     private Texture tex;
     private Sprite splash;
     private Hybridity game;

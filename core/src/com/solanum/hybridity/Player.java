@@ -21,7 +21,7 @@ import java.util.ArrayList;
  *         <p/>
  *         It updates and translates the camera according to payer movement
  */
-class Player extends Actor {
+public class Player extends Actor {
 
     private float rotation;
     private float lastShot;
@@ -172,11 +172,11 @@ class Player extends Actor {
 
 
         /** Kills the player if it is outside the Mainland during phase 1 of the game*/
-        if (GameScreen.phase == 1) {
+        /*if (GameScreen.phase == 1) {
             if (!((Mainland) getStage().getRoot().findActor("ml")).containsPoint((int) (getX() + (getWidth() / 2)), (int) (getY() + (getHeight() / 2)))) {
                 this.destroy();
             }
-        }
+        }*/
 
         /**
          * Updates the position of the Sprite to be in line with the updated position of the Player

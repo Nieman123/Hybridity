@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * be set as active. It listens for input from the space bar and starts the game.
  */
 
-class TitleScreen implements Screen {
+public class TitleScreen implements Screen {
 
     private final Hybridity game;
     private Texture tex;
