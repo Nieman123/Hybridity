@@ -103,13 +103,6 @@ public class Seeder extends Actor {
             growOctagon();
         }
 
-        if(Gdx.input.isButtonPressed(Input.Keys.E)) {
-            updateMainland();
-        }
-
-
-
-
     }
 
 
@@ -129,7 +122,7 @@ public class Seeder extends Actor {
         render.setProjectionMatrix(getStage().getCamera().combined);
         render.setAutoShapeType(true);
         render.begin();
-        render.setColor(Color.CYAN);
+        render.setColor(Color.RED);
 
 
         /**
@@ -138,13 +131,14 @@ public class Seeder extends Actor {
 
         if (!following && octagon != null) {
 
-            v = new float[territory.vertexNumber()*2];
-            for (int i = 0; i < territory.vertexNumber(); i++) {
-                v[i * 2] = (float) territory.vertex(i).x();
-                v[(i * 2) + 1] = (float) territory.vertex(i).y();
+            v = new float[octagon.vertexNumber()*2];
+            for (int i = 0; i < octagon.vertexNumber(); i++) {
+                v[i * 2] = (float) octagon.vertex(i).x();
+                v[(i * 2) + 1] = (float) octagon.vertex(i).y();
             }
 
-           render.polygon(findIntersect());
+            render.polygon(v);
+           findExclusiveOr();
         }
 
         render.end();
@@ -209,27 +203,37 @@ public class Seeder extends Actor {
 
         }
 
-
         return intersect;
     }
 
-    /**
-     * Find Difference will remove the overlap of this seeder's territorial polygon and the Mainland polygon
-     */
-    public void updateMainland() {
+    public float[] findExclusiveOr() {
 
         ml = getStage().getRoot().findActor("ml");
 
-        SimplePolygon2D newArea = new SimplePolygon2D();
+        Polygon2D eOr  = Polygons2D.difference(ml.area, octagon);
 
-        Polygon2D eOr  =  Polygons2D.exclusiveOr(territory, ml.area);
+        SimplePolygon2D mainland = new SimplePolygon2D();
 
-        for(int i = 0; i < eOr.vertexNumber(); i++) {
+        for( int i = 0; i < eOr.vertexNumber(); i++) {
 
-            newArea.addVertex(new Point2D(eOr.vertex(i).x() , eOr.vertex(i).y()));
+            mainland.addVertex(new Point2D(eOr.vertex(i).x(), eOr.vertex(i).y()));
         }
 
-        ml.area = newArea;
+
+        ((Mainland)getStage().getRoot().findActor("ml")).area = mainland;
+
+
+        return new float[]{};
+    }
+
+
+
+    /**
+     * Updates the Mainland with it's new territory
+     */
+    public void updateMainland() {
+
+
 
     }
 

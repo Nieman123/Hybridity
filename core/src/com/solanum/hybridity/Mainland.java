@@ -3,15 +3,21 @@ package com.solanum.hybridity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.SimplePolygon2D;
+
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
 
 
 /**
  * @author Aldous
  *         ITS Room - "Silence"
- *         <p/>
+ *         <p>
  *         The Mainland is the central focus of the game. It is a polygonal shape that must be defended during the start
  *         of the game. Seeder will attatch to the outside of it's perimeter and attempt to claim territory inside of it.
  *         <p/>
@@ -24,6 +30,7 @@ public class Mainland extends Actor {
     public int oY;
     public SimplePolygon2D area;
 
+
     /**
      * Creates a new Mainland with a square shape
      *
@@ -31,6 +38,12 @@ public class Mainland extends Actor {
      * @param y The y origin of the Mainland to be created
      */
     public Mainland(int x, int y) {
+
+
+        Polygon test = new Polygon();
+
+
+
 
         oX = x;
         oY = y;
@@ -93,6 +106,10 @@ public class Mainland extends Actor {
          */
         render.setProjectionMatrix(getStage().getCamera().combined);
 
+
+        Area testShape = new Area();
+
+        PathIterator test = testShape.getPathIterator(null);
 
 
         render.setColor(Color.CYAN);

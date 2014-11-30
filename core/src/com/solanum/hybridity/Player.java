@@ -161,7 +161,6 @@ public class Player extends Actor {
             }
         }
 
-
         /** Normalizes sprite rotation in case it is sub-360 degrees */
         if (sprite.getRotation() < 0) {
             sprite.setRotation(360 + sprite.getRotation());
@@ -171,17 +170,17 @@ public class Player extends Actor {
         getStage().getCamera().translate(this.getX() - lastX, this.getY() - lastY, 0);
 
 
-        /** Kills the player if it is outside the Mainland during phase 1 of the game*/
-        /*if (GameScreen.phase == 1) {
-            if (!((Mainland) getStage().getRoot().findActor("ml")).containsPoint((int) (getX() + (getWidth() / 2)), (int) (getY() + (getHeight() / 2)))) {
-                this.destroy();
-            }
-        }*/
+        /** Kills the player if it is outside the Mainland  during phase 1 of the game*/
+        if (GameScreen.phase == 1) {
+            System.out.println(((Mainland)getStage().getRoot().findActor("ml")).containsPoint((int)(getX()+getWidth()/2),(int)(getY()/getHeight()/2)));
+        }
 
         /**
          * Updates the position of the Sprite to be in line with the updated position of the Player
          */
         sprite.setPosition(getX(), getY());
+
+
 
     }
 
