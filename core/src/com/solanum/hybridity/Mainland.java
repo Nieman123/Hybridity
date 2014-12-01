@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.seisw.util.geom.Poly;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.SimplePolygon2D;
 
@@ -28,7 +29,7 @@ public class Mainland extends Actor {
     private float[] v;
     public int oX;
     public int oY;
-    public SimplePolygon2D area;
+    public java.awt.Polygon area;
 
 
     /**
@@ -39,27 +40,23 @@ public class Mainland extends Actor {
      */
     public Mainland(int x, int y) {
 
-
-        Polygon test = new Polygon();
-
-
-
-
         oX = x;
         oY = y;
 
         /**
          * Initializes the representation of this objects vertices
          */
-        area = new SimplePolygon2D();
+        area = new java.awt.Polygon();
 
         /**
          * Initializes the four vertices of the Mainland
          */
-        area.addVertex(new Point2D(x, y + 400));
-        area.addVertex(new Point2D(x + 400, y));
-        area.addVertex(new Point2D(x, y - 400));
-        area.addVertex(new Point2D(x - 400, y));
+        x=x-200;
+        y=y-200;
+        area.addPoint(x, y + 400);
+        area.addPoint(x + 400, y + 400);
+        area.addPoint(x + 400, y);
+        area.addPoint(x, y);
 
         /**
          * Sets the name property of this Actor. This can later be used from within other Actors to find this specific
@@ -87,7 +84,7 @@ public class Mainland extends Actor {
      */
     public boolean containsPoint(int x, int y) {
 
-        return !area.contains(x, y);
+        return area.contains(x , y);
     }
 
     public void draw(Batch batch, float parentAlpha) {
@@ -106,12 +103,6 @@ public class Mainland extends Actor {
          */
         render.setProjectionMatrix(getStage().getCamera().combined);
 
-
-        Area testShape = new Area();
-
-        PathIterator test = testShape.getPathIterator(null);
-
-
         render.setColor(Color.CYAN);
 
         /**
@@ -119,17 +110,25 @@ public class Mainland extends Actor {
          * drawn by the shape renderer. Converts the Polygon object to a linear array in the form of
          * [x , y . . .etc]
          */
-        v = new float[area.vertexNumber() * 2];
+        v = new float[area.npoints * 2];
 
-        for (int i = 0; i < area.vertexNumber(); i++) {
-            v[i * 2] = (float) area.vertex(i).x();
-            v[(i * 2) + 1] = (float) area.vertex(i).y();
+        for (int i = 0; i < area.npoints; i++) {
+            v[i * 2] = area.xpoints[i];
+            v[(i * 2) + 1] = area.ypoints[i];
         }
 
         /**
          * Ends the drawing sequence of the shape renderer and begins the Spritebatch's drawing process again.
          */
-        render.polygon(v);
+        try{
+
+            render.polygon(v);
+
+        } catch (Exception e) {
+
+
+
+        }
         render.end();
 
         batch.begin();

@@ -10,12 +10,19 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.seisw.util.geom.Poly;
+import javafx.scene.shape.*;
+import javafx.scene.shape.Polygon;
+import math.geom2d.AffineTransform2D;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.Polygon2D;
 import math.geom2d.polygon.Polygons2D;
 import math.geom2d.polygon.SimplePolygon2D;
+import sun.applet.Main;
 
 import java.awt.*;
+import java.awt.Shape;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -39,16 +46,14 @@ public class Seeder extends Actor {
     private final int gX;
     private final int gY;
     int speed = 3;
-    private SimplePolygon2D octagon;
-    private SimplePolygon2D territory;
-    private SimplePolygon2D originalMainland;
+    private java.awt.Polygon octagon;
+    private Area territory = new Area();
     private float radius;
     private float startAngle;
     private boolean following = true;
     private float timeSinceHit;
     private float getTimeSinceUpdate = 0;
     private int HP = 15;
-    private Mainland ml;
 
 
     /**
@@ -58,7 +63,7 @@ public class Seeder extends Actor {
      * @param goalX The x coordinate of the point that the seeder will follow
      * @param goalY The y coordinate of the point that the seeder will follow
      */
-    Seeder(float x, float y, int goalX, int goalY, Mainland goal) {
+    Seeder(int x, int y, int goalX, int goalY, Mainland goal) {
         sprite.setOrigin(x, y);
 
         gX = goalX;
@@ -71,9 +76,8 @@ public class Seeder extends Actor {
 
         collision.set(sprite.getBoundingRectangle());
 
-        originalMainland = goal.area;
 
-        territory = new SimplePolygon2D();
+
     }
 
 
@@ -101,7 +105,22 @@ public class Seeder extends Actor {
         if (getTimeSinceUpdate > .1 && !following) {
             getTimeSinceUpdate = 0;
             growOctagon();
+
+            Area oct = new Area(octagon);
+
+            Area ml = new Area(((Mainland)getStage().getRoot().findActor("ml")).area);
+
+            oct.intersect(ml);
+
+            territory.add(oct);
+
+            ml.subtract(territory);
+
+            ((Mainland)getStage().getRoot().findActor("ml")).area = areaToShape(ml);
+
         }
+
+
 
     }
 
@@ -126,20 +145,21 @@ public class Seeder extends Actor {
 
 
         /**
-         * Converts the octagon into a simplistic, drawable array and passes it to the shape renderer
+         * Draws the current territory of the Seeder.
          */
-
         if (!following && octagon != null) {
 
-            v = new float[octagon.vertexNumber()*2];
-            for (int i = 0; i < octagon.vertexNumber(); i++) {
-                v[i * 2] = (float) octagon.vertex(i).x();
-                v[(i * 2) + 1] = (float) octagon.vertex(i).y();
-            }
+            try{
+                //render.polygon(getVertices(octagon));
+                render.polygon(getVertices(areaToShape(territory)));
 
-            render.polygon(v);
-           findExclusiveOr();
+            } catch (Exception e ){
+
+
+
+            }
         }
+
 
         render.end();
         batch.begin();
@@ -148,28 +168,28 @@ public class Seeder extends Actor {
 
     /**
      * Increases the radius of the territorial shape by one and updates the shape. This shape is to be considered pure.
-     * Meaning that it is, in essence, an Octagon. Calculations related to overlap and intersections are perfomed
+     * Meaning that it is, in essence, an Octagon. Calculations related to overlap and intersections are performed
      * elsewhere.
      */
     void growOctagon() {
         if (octagon == null) {
-            octagon = new SimplePolygon2D();
+            octagon = new java.awt.Polygon();
             radius = 0;
         }
-        radius++;
+        radius+=5;
 
-        octagon.clearVertices();
+        octagon.reset();
 
         startAngle = 0;
 
-        float x;
-        float y;
+        int x;
+        int y;
 
         for (int i = 0; i < 8; i++) {
-            x = (float) ((getX() + sprite.getWidth() / 2) + radius * Math.cos(Math.toRadians(startAngle)));
-            y = (float) ((getY() + sprite.getHeight() / 2) + radius * Math.sin(Math.toRadians(startAngle)));
+            x = (int) ((getX() + sprite.getWidth() / 2) + radius * Math.cos(Math.toRadians(startAngle)));
+            y = (int) ((getY() + sprite.getHeight() / 2) + radius * Math.sin(Math.toRadians(startAngle)));
 
-            octagon.addVertex(new Point2D( x, y));
+            octagon.addPoint(x, y);
 
             startAngle += 360 / 8;
         }
@@ -178,65 +198,27 @@ public class Seeder extends Actor {
     }
 
     /**
-     * Identifies the intersect of the Mainland polygon and this seeder's territorial polygon and returns the result
-     *
-     * @return A linear array of floats representing (x, y ,x1 , y1 . . .] in the polygon.
+     * Returns a simplistic representation of the vertices that make up a shape. The returned array can be passed
+     * directly into a ShapeRenderer for ease of use when depicting Polygons.
+     * @param shape A shape from the math.2d.geom library that is to be inspected
+     * @return An array of integers in the format [x, y, x, y,  . . . ], the array is technically a float however,
+     * fulfill the requirements of the ShapeRenderer.polygon() method.
      */
-    public float[] findIntersect() {
-
-        ml = getStage().getRoot().findActor("ml");
-
-        Polygon2D overlap = Polygons2D.intersection(originalMainland, octagon);
-
-        territory.clearVertices();
-        for(int i = 0; i < overlap.vertexNumber(); i++) {
-
-            territory.addVertex(new Point2D(overlap.vertex(i).x() , overlap.vertex(i).y()));
+    public float[] getVertices(java.awt.Polygon shape) {
+        float[] verts = new float[shape.npoints*2];
+        for (int i = 0; i < shape.npoints; i++) {
+            verts[i * 2] = shape.xpoints[i];
+            verts[(i * 2) + 1] = shape.ypoints[i];
         }
 
-        float[] intersect = new float[overlap.vertexNumber()*2];
-
-        for( int i = 0; i < overlap.vertexNumber(); i++ ) {
-
-            intersect[i * 2 ] = (float )overlap.vertex(i).x();
-            intersect[(i * 2 ) + 1] = (float )overlap.vertex(i).y();
-
-        }
-
-        return intersect;
+        return verts;
     }
-
-    public float[] findExclusiveOr() {
-
-        ml = getStage().getRoot().findActor("ml");
-
-        Polygon2D eOr  = Polygons2D.difference(ml.area, octagon);
-
-        SimplePolygon2D mainland = new SimplePolygon2D();
-
-        for( int i = 0; i < eOr.vertexNumber(); i++) {
-
-            mainland.addVertex(new Point2D(eOr.vertex(i).x(), eOr.vertex(i).y()));
-        }
-
-
-        ((Mainland)getStage().getRoot().findActor("ml")).area = mainland;
-
-
-        return new float[]{};
-    }
-
 
 
     /**
-     * Updates the Mainland with it's new territory
+     * Fired by a Bullet whenever it detects that it is hitting a Seeder. Decrements the health of the Seeder and handles
+     * removing it from play if the current HP is 0.
      */
-    public void updateMainland() {
-
-
-
-    }
-
     public void hit() {
         HP--;
         hit.play(0.3f);
@@ -245,6 +227,42 @@ public class Seeder extends Actor {
             death.play(0.3f);
             this.remove();
         }
+    }
+
+
+    /**
+     * Accepts a Java.Awt.Area object and iterates over it, building a more specific polygon that might be better
+     * suited for interpreting or finding information about the path. This is done because the Polygon class provided
+     * by the AWT package has more convenience methods for accessing data fields about the Polygon. The Area class
+     * relies on a ShapeIterator in order to retrieve it's vertices, whereas the Polygon maintains its X and Y
+     * points in the fields 'xPoints[]' and 'yPoints[]'
+     *
+     * @param area the Area object that is to be converted into a Polygon
+     * @return The Polygon comprised of vertices from the Area
+     */
+    public java.awt.Polygon areaToShape(Area area){
+
+        java.awt.Polygon shape = new java.awt.Polygon();
+        /**
+         * The Affine Transform property is used to preemptively apply a Matrix transformation to every path inside
+         * of the Area. The constructor below creates a neutral AffineTransform object that returns the 'pure' points
+         * without any transformations.
+         */
+        FlatteningPathIterator path = new FlatteningPathIterator(area.getPathIterator(new AffineTransform()) ,1);
+        while(!path.isDone()) {
+
+            double[] coord = new double[2];
+
+            if(path.currentSegment(coord) == PathIterator.SEG_CLOSE) {
+                break;
+            }
+            shape.addPoint((int) coord[0],(int) coord[1]);
+            path.next();
+
+        }
+
+        return shape;
+
     }
 
 }

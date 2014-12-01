@@ -108,7 +108,7 @@ public class GameScreen implements Screen {
             }
         }
 
-        gameStage.addActor(new Seeder(ml.oX + newX, ml.oY + newY, ml.oX, ml.oY, ml));
+        gameStage.addActor(new Seeder((int) (ml.oX + newX), (int) (ml.oY + newY), ml.oX, ml.oY, ml));
 
 
     }
