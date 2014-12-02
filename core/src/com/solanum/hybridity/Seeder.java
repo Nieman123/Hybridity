@@ -31,7 +31,7 @@ import java.util.Iterator;
  * @author Aldous
  *         "You Know I Have To Go" - Royksopp
  *         <p/>
- *         The Seeder class represents an enemy that is spawned outside the perimeter of the Mainland, move towards it's
+ *         The Seeder class represents an enemy that is spawned outside the perimeter of the Mainland, moves towards it's
  *         origin and then latches on to the outside of the perimeter. Once it has latched onto the outside of the Mainland,
  *         it will begin expanding in an octoganal shape and claiming territory inside of the Mainland.
  */
@@ -108,15 +108,18 @@ public class Seeder extends Actor {
 
             Area oct = new Area(octagon);
 
-            Area ml = new Area(((Mainland)getStage().getRoot().findActor("ml")).area);
+            Area ml = new Area(((Mainland) getStage().getRoot().findActor("ml")).area);
 
-            oct.intersect(ml);
+            //oct.intersect(ml);
 
-            territory.add(oct);
 
-            ml.subtract(territory);
+            //This portion performs precisely as expected. The path iterator retrieves the exact points necessary  at the right time.
+            //territory.add(oct);
 
-            ((Mainland)getStage().getRoot().findActor("ml")).area = areaToShape(ml);
+            ml.subtract(oct);
+            boolean fuck = true;
+
+            ((Mainland) getStage().getRoot().findActor("ml")).area = areaToShape(ml);
 
         }
 
@@ -151,7 +154,7 @@ public class Seeder extends Actor {
 
             try{
                 //render.polygon(getVertices(octagon));
-                render.polygon(getVertices(areaToShape(territory)));
+                //render.polygon(getVertices(areaToShape(territory)));
 
             } catch (Exception e ){
 
@@ -174,9 +177,9 @@ public class Seeder extends Actor {
     void growOctagon() {
         if (octagon == null) {
             octagon = new java.awt.Polygon();
-            radius = 0;
+            radius = 5;
         }
-        radius+=5;
+        radius+=1;
 
         octagon.reset();
 
@@ -248,18 +251,23 @@ public class Seeder extends Actor {
          * of the Area. The constructor below creates a neutral AffineTransform object that returns the 'pure' points
          * without any transformations.
          */
-        FlatteningPathIterator path = new FlatteningPathIterator(area.getPathIterator(new AffineTransform()) ,1);
+        PathIterator path = area.getPathIterator(new AffineTransform());
         while(!path.isDone()) {
 
             double[] coord = new double[2];
 
-            if(path.currentSegment(coord) == PathIterator.SEG_CLOSE) {
-                break;
+            int type = path.currentSegment(coord);
+            if(type == PathIterator.SEG_MOVETO || type == PathIterator.SEG_LINETO) {
+
+                shape.addPoint((int) coord[0],(int) coord[1]);
+
             }
-            shape.addPoint((int) coord[0],(int) coord[1]);
+
             path.next();
 
         }
+
+        //todo: write a culling function that removes excess points from the path before finalizeing it.
 
         return shape;
 

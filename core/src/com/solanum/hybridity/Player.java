@@ -172,7 +172,10 @@ public class Player extends Actor {
 
         /** Kills the player if it is outside the Mainland  during phase 1 of the game*/
         if (GameScreen.phase == 1) {
-            //System.out.println(((Mainland)getStage().getRoot().findActor("ml")).containsPoint((int)(getX()+getWidth()/2),(int)(getY()/getHeight()/2)));
+
+            if (((Mainland) getStage().getRoot().findActor("ml")).containsPoint((int) (this.getX() + sprite.getWidth() / 2), (int) (this.getY() + sprite.getHeight() / 2))) {
+                System.out.println("In");
+            }
         }
 
         /**
