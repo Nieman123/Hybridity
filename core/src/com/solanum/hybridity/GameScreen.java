@@ -1,11 +1,13 @@
 package com.solanum.hybridity;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import sun.applet.Main;
 
 
 /**
@@ -23,13 +25,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameScreen implements Screen {
 
-
     public static int phase = 1;
     private final Hybridity game;
     private final Stage gameStage;
     private final Mainland ml;
-    private final int numOfSeeds = 1;
+    private int numOfSeeds = 2;
     private final Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
+    private double timeSinceSeederUpdate = 5;
+    private double timeSinceEnemyUpdate = 5;
+    private int offset = 0;
 
 
     /**
@@ -44,18 +48,6 @@ public class GameScreen implements Screen {
         ml = new Mainland(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         gameStage.addActor(ml);
         gameStage.addActor(player);
-
-
-        /**
-         * Divides a 360 degree circle by the amount of specified enemies and then stargt
-         */
-        if (numOfSeeds > 0) {
-            float degreeDivision = 360 / numOfSeeds;
-
-            for (int i = 1; i <= numOfSeeds; i++) {
-                plantSeed(i * degreeDivision, 900 * i);
-            }
-        }
 
 
         /**
@@ -75,6 +67,7 @@ public class GameScreen implements Screen {
      */
     void plantSeed(float angle, float distance) {
 
+        Mainland ml = gameStage.getRoot().findActor("ml");
         angle = angle % 360;
         float nAngle = angle % 90;
 
@@ -110,6 +103,52 @@ public class GameScreen implements Screen {
 
         gameStage.addActor(new Seeder((int) (ml.oX + newX), (int) (ml.oY + newY), ml.oX, ml.oY, ml));
 
+    }
+
+    /**
+     * Places a Seeder at the specified angle relative to the origin of the Mainland and at the specified distance
+     * away from the Mainland.
+     *
+     * @param angle
+     * @param distance
+     */
+    void plantEnemy(float angle, float distance) {
+
+        Mainland ml = gameStage.getRoot().findActor("ml");
+        angle = angle % 360;
+        float nAngle = angle % 90;
+
+        float adjacent;
+        float opposite;
+        float hypoteneuse = distance;
+        double sin = Math.sin(Math.toRadians(nAngle));
+
+        opposite = (float) sin * hypoteneuse;
+
+        adjacent = (float) Math.sqrt((hypoteneuse * hypoteneuse) - (opposite * opposite));
+
+        float newX;
+        float newY;
+
+        if (angle < 180) {
+            if (angle >= 90) {
+                newX = -opposite;
+                newY = adjacent;
+            } else {
+                newX = adjacent;
+                newY = opposite;
+            }
+        } else {
+            if (angle >= 270) {
+                newX = opposite;
+                newY = -adjacent;
+            } else {
+                newX = -adjacent;
+                newY = -opposite;
+            }
+        }
+
+        gameStage.addActor(new Seeder((int) (ml.oX + newX), (int) (ml.oY + newY), ml.oX, ml.oY, ml));
 
     }
 
@@ -128,6 +167,36 @@ public class GameScreen implements Screen {
             if (c instanceof Player)
                 playerActive = true;
         }
+
+        /**
+         * Listens for Key input that will spawn new seeders.
+         */
+        timeSinceSeederUpdate +=delta;
+        if(Gdx.input.isKeyPressed(Input.Keys.Q) && timeSinceSeederUpdate>5 ){
+            timeSinceSeederUpdate = 0;
+            if (numOfSeeds > 0) {
+                float degreeDivision = 360 / numOfSeeds;
+
+                for (int i = 1; i <= numOfSeeds; i++) {
+                    plantSeed(i * degreeDivision, 900 * i);
+                }
+            }
+
+            numOfSeeds ++;
+        }
+
+        timeSinceEnemyUpdate +=delta;
+        if(Gdx.input.isKeyPressed(Input.Keys.R) && timeSinceSeederUpdate>5 ){
+            timeSinceEnemyUpdate = 0;
+
+            float degreeDivision = 360 / 3;
+
+            for (int i = 1; i <= numOfSeeds; i++) {
+                plantSeed(i * degreeDivision, 900 * i);
+            }
+        }
+
+
 
         if (!playerActive) {
             game.setScreen(game.loseScreen);

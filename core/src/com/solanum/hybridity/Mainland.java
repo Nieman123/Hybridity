@@ -1,7 +1,10 @@
 package com.solanum.hybridity;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,6 +16,7 @@ import math.geom2d.polygon.SimplePolygon2D;
 
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
+import java.util.ArrayList;
 
 
 /**
@@ -30,7 +34,9 @@ public class Mainland extends Actor {
     public int oX;
     public int oY;
     public java.awt.Polygon area;
-
+    public ArrayList<Asteroid> asteroids = new ArrayList<>();
+    private boolean hasDispersed = false;
+    private BitmapFont font = new BitmapFont();
 
     /**
      * Creates a new Mainland with a square shape
@@ -65,6 +71,12 @@ public class Mainland extends Actor {
          */
         this.setName("ml");
 
+        /**
+         * Initializes the Font color
+         */
+        font.setColor(Color.WHITE);
+        font.setScale(1.2f);
+
     }
 
     /**
@@ -74,6 +86,23 @@ public class Mainland extends Actor {
      */
     public void act(float delta) {
 
+        if(Gdx.input.isKeyPressed(Input.Keys.E) && !hasDispersed) {
+
+            for(Asteroid c : asteroids) {
+
+                c.disperse((int) area.getBounds().getCenterX(), (int) area.getBounds().getCenterY());
+            }
+
+            hasDispersed = true;
+        }
+
+        if(hasDispersed) {
+
+            for(Asteroid c : asteroids) {
+
+                c.update(delta);
+            }
+        }
     }
 
     /**
@@ -94,7 +123,7 @@ public class Mainland extends Actor {
          */
         batch.end();
         render.setAutoShapeType(true);
-        render.begin();
+        render.begin(ShapeRenderer.ShapeType.Line);
 
         /**
          * Fetches the projection matrix of the stage that this Actor is contained within. The Stage's camera
@@ -118,21 +147,93 @@ public class Mainland extends Actor {
             v[(i * 2) + 1] = area.ypoints[i];
         }
 
+        render.polygon(v);
         /**
          * Ends the drawing sequence of the shape renderer and begins the Spritebatch's drawing process again.
          */
-        try{
 
-            render.polygon(v);
+        render.setColor(Color.RED);
 
-        } catch (Exception e) {
+        for(Asteroid c : asteroids) {
 
+            try{
 
+                render.polygon(getVertices(c.body));
 
+                /**
+                 * Render the ammo count of each Asteroid.
+                 */
+                if(hasDispersed) {
+                    render.end();
+                    batch.begin();
+                    font.draw(batch, Integer.toString(c.ammo), (float) c.body.getBounds().getCenterX() - 10, (float) c.body.getBounds().getCenterY());
+                    batch.end();
+                    render.begin();
+
+                }
+            } catch(Exception e) {
+
+                System.err.println(e.getMessage());
+            }
         }
+        render.set(ShapeRenderer.ShapeType.Filled);
+        render.setColor(Color.RED);
+
+
         render.end();
 
         batch.begin();
 
     }
+
+
+    /**
+     * Returns a simplistic representation of the vertices that make up a shape. The returned array can be passed
+     * directly into a ShapeRenderer for ease of use when depicting Polygons.
+     * @param shape A shape from the math.2d.geom library that is to be inspected
+     * @return An array of integers in the format [x, y, x, y,  . . . ], the array is technically a float however,
+     * fulfill the requirements of the ShapeRenderer.polygon() method.
+     */
+    public float[] getVertices(java.awt.Polygon shape) {
+        float[] verts = new float[shape.npoints*2];
+        for (int i = 0; i < shape.npoints; i++) {
+            verts[i * 2] = shape.xpoints[i];
+            verts[(i * 2) + 1] = shape.ypoints[i];
+        }
+
+        return verts;
+    }
+
+
+    /**
+     * Creates a large shape that is shrunk each tick. Any object that is not inside of this object is
+     * repelled away from the origin of the Mainland. Handles the staggered repelling effect that
+     * occurs when the Astroids are pushed away from the homeland.
+     */
+   /* void shrinkOctagon() {
+        if (octagon == null) {
+            octagon = new java.awt.Polygon();
+            radius = 5;
+        }
+        radius+=2;
+
+        octagon.reset();
+
+        startAngle = 0;
+
+        int x;
+        int y;
+
+        for (int i = 0; i < 8; i++) {
+            x = (int) ((getX() + sprite.getWidth() / 2) + radius * Math.cos(Math.toRadians(startAngle)));
+            y = (int) ((getY() + sprite.getHeight() / 2) + radius * Math.sin(Math.toRadians(startAngle)));
+
+            octagon.addPoint(x, y);
+
+            startAngle += 360 / 8;
+        }
+
+
+    }*/
+
 }

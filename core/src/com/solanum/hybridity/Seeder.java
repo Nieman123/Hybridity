@@ -50,10 +50,10 @@ public class Seeder extends Actor {
     private Area territory = new Area();
     private float radius;
     private float startAngle;
-    private boolean following = true;
+    boolean following = true;
     private float timeSinceHit;
     private float getTimeSinceUpdate = 0;
-    private int HP = 15;
+    private int HP = 6;
 
 
     /**
@@ -106,21 +106,6 @@ public class Seeder extends Actor {
             getTimeSinceUpdate = 0;
             growOctagon();
 
-            Area oct = new Area(octagon);
-
-            Area ml = new Area(((Mainland) getStage().getRoot().findActor("ml")).area);
-
-            //oct.intersect(ml);
-
-
-            //This portion performs precisely as expected. The path iterator retrieves the exact points necessary  at the right time.
-            //territory.add(oct);
-
-            ml.subtract(oct);
-            boolean fuck = true;
-
-            ((Mainland) getStage().getRoot().findActor("ml")).area = areaToShape(ml);
-
         }
 
 
@@ -153,24 +138,21 @@ public class Seeder extends Actor {
         if (!following && octagon != null) {
 
             try{
-                //render.polygon(getVertices(octagon));
-                //render.polygon(getVertices(areaToShape(territory)));
+
+                render.polygon(getVertices(octagon));
 
             } catch (Exception e ){
 
 
-
             }
         }
-
-
         render.end();
         batch.begin();
 
     }
 
     /**
-     * Increases the radius of the territorial shape by one and updates the shape. This shape is to be considered pure.
+     * Increases the radius of the territorial shape and updates the shape. This shape is to be considered pure.
      * Meaning that it is, in essence, an Octagon. Calculations related to overlap and intersections are performed
      * elsewhere.
      */
@@ -179,7 +161,7 @@ public class Seeder extends Actor {
             octagon = new java.awt.Polygon();
             radius = 5;
         }
-        radius+=1;
+        radius+=2;
 
         octagon.reset();
 
@@ -228,6 +210,18 @@ public class Seeder extends Actor {
         timeSinceHit = 0;
         if (HP <= 0) {
             death.play(0.3f);
+            Area ml = new Area(((Mainland)getStage().getRoot().findActor("ml")).area);
+
+            Area intersect = new Area((octagon));
+
+            intersect.intersect(ml);
+
+            ml.subtract(intersect);
+
+
+            ((Mainland)getStage().getRoot().findActor("ml")).asteroids.add(new Asteroid(areaToShape(intersect)));
+
+            ((Mainland)getStage().getRoot().findActor("ml")).area = areaToShape(ml);
             this.remove();
         }
     }
@@ -257,20 +251,100 @@ public class Seeder extends Actor {
             double[] coord = new double[2];
 
             int type = path.currentSegment(coord);
-            if(type == PathIterator.SEG_MOVETO || type == PathIterator.SEG_LINETO) {
+            if (!(coord[0] == 0 && coord[1] == 0)) {
 
-                shape.addPoint((int) coord[0],(int) coord[1]);
+                shape.addPoint((int) coord[0], (int) coord[1]);
 
             }
 
             path.next();
 
+
+
         }
-
-        //todo: write a culling function that removes excess points from the path before finalizeing it.
-
         return shape;
 
     }
 
+
+    /**
+     * Experimental new iterator to accurately read the line segments of a shape
+     */
+    public java.awt.Polygon testIterator() {
+
+        Area area = new Area(((Mainland) getStage().getRoot().findActor("ml")).area);
+
+        ArrayList<double[]> areaPoints = new ArrayList<double[]>();
+        ArrayList<Line2D.Double> areaSegments = new ArrayList<Line2D.Double>();
+        double[] coords = new double[6];
+
+        for (PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
+            // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
+            // Because the Area is composed of straight lines
+            int type = pi.currentSegment(coords);
+            // We record a double array of {segment type, x coord, y coord}
+            double[] pathIteratorCoords = {type, coords[0], coords[1]};
+            areaPoints.add(pathIteratorCoords);
+        }
+
+        double[] start = new double[3]; // To record where each polygon starts
+
+        for (int i = 0; i < areaPoints.size(); i++) {
+            // If we're not on the last point, return a line from this point to the next
+            double[] currentElement = areaPoints.get(i);
+
+            // We need a default value in case we've reached the end of the ArrayList
+            double[] nextElement = {-1, -1, -1};
+            if (i < areaPoints.size() - 1) {
+                nextElement = areaPoints.get(i + 1);
+            }
+
+            // Make the lines
+            if (currentElement[0] == PathIterator.SEG_MOVETO) {
+                start = currentElement; // Record where the polygon started to close it later
+            }
+
+            if (nextElement[0] == PathIterator.SEG_LINETO) {
+                areaSegments.add(
+                        new Line2D.Double(
+                                currentElement[1], currentElement[2],
+                                nextElement[1], nextElement[2]
+                        )
+                );
+            } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
+                areaSegments.add(
+                        new Line2D.Double(
+                                currentElement[1], currentElement[2],
+                                start[1], start[2]
+                        )
+                );
+            }
+        }
+
+        //todo: write a culling function that eliminates redundant points
+        java.awt.Polygon please = new java.awt.Polygon();
+
+
+        ArrayList<java.awt.geom.Point2D> points = new ArrayList<java.awt.geom.Point2D>();
+
+        for(Line2D.Double c : areaSegments) {
+
+
+            java.awt.geom.Point2D point = new java.awt.geom.Point2D.Float((float)c.x2, (float) c.y2);
+
+            if(!points.contains(point)) {
+                System.out.println("REPEAT ELIMINATED");
+                points.add(point);
+            }
+        }
+
+
+        for(java.awt.geom.Point2D pt : points) {
+
+            please.addPoint((int) pt.getX(), (int) pt.getY());
+        }
+
+        return please;
+
+    }
 }

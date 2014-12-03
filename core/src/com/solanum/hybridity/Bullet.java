@@ -105,7 +105,7 @@ public class Bullet extends Actor {
             Actor c = actors.next();
             if (c instanceof Seeder) {
                 Rectangle seederC = ((Seeder) c).collision;
-                if (Intersector.overlaps(bulletSprite.getBoundingRectangle(), seederC)) {
+                if (Intersector.overlaps(bulletSprite.getBoundingRectangle(), seederC) && !((Seeder) c).following) {
                     ((Seeder) c).hit();
                     this.destroy();
                 }
