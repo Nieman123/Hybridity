@@ -35,7 +35,7 @@ public class Mainland extends Actor {
     public int oY;
     public java.awt.Polygon area;
     public ArrayList<Asteroid> asteroids = new ArrayList<>();
-    private boolean hasDispersed = false;
+    public boolean hasDispersed = false;
     private BitmapFont font = new BitmapFont();
 
     /**
@@ -87,6 +87,8 @@ public class Mainland extends Actor {
     public void act(float delta) {
 
         if(Gdx.input.isKeyPressed(Input.Keys.E) && !hasDispersed) {
+
+
 
             for(Asteroid c : asteroids) {
 

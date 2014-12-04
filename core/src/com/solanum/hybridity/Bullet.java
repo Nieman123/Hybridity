@@ -87,8 +87,15 @@ public class Bullet extends Actor {
         int centerX = (int) (getX() + (getWidth() / 2));
         int centerY = (int) (getY() + (getHeight() / 2));
 
+        Iterator<Actor> actors = null;
+        try{
 
-        Iterator<Actor> actors = getStage().getActors().iterator();
+            actors = getStage().getActors().iterator();
+
+        } catch(Exception e ){
+
+
+        }
 
 
         if (GameScreen.phase == 1) {
@@ -101,14 +108,24 @@ public class Bullet extends Actor {
          * Checks this Actor against all Seeders in play, calls the hit method of any colliding Seeders,
          * and then terminates this Actor.
          */
-        while (actors.hasNext()) {
-            Actor c = actors.next();
-            if (c instanceof Seeder) {
-                Rectangle seederC = ((Seeder) c).collision;
-                if (Intersector.overlaps(bulletSprite.getBoundingRectangle(), seederC) && !((Seeder) c).following) {
-                    ((Seeder) c).hit();
-                    this.destroy();
-                }
+        if (actors != null) {
+            while (actors.hasNext()) {
+                Actor c = actors.next();
+                if (c instanceof Seeder) {
+                    Rectangle seederC = ((Seeder) c).collision;
+                    if (Intersector.overlaps(bulletSprite.getBoundingRectangle(), seederC) && !((Seeder) c).following) {
+                        ((Seeder) c).hit();
+                        this.destroy();
+                    }
+                } else if (c instanceof Enemy){
+                    Rectangle enemyC = ((Enemy) c).collision;
+                    if (Intersector.overlaps(bulletSprite.getBoundingRectangle(), enemyC) && ((Enemy) c).following) {
+                        ((Enemy) c).hit();
+                        this.destroy();
+                    }
+
+
+                };
             }
         }
     }

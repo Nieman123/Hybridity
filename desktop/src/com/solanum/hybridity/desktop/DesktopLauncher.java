@@ -8,6 +8,7 @@ class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
         config.vSyncEnabled=true;
+        //config.fullscreen=true;
 
         config.width = 1280;
         config.height = 720;

@@ -43,12 +43,12 @@ public class SplashScreen implements Screen {
             splash.translate(0, -180 * delta);
             if (splash.getY() < Gdx.graphics.getHeight() / 2 - splash.getHeight() / 2) {
                 sliding = false;
-                chime.play();
+                chime.play(0.5f);
 
             }
         } else {
             idleTime += delta;
-            if (idleTime > 5) {
+            if (idleTime > 3) {
                 game.setScreen(game.titleScreen);
                 this.dispose();
             }
@@ -59,6 +59,7 @@ public class SplashScreen implements Screen {
         splash.draw(batch);
         batch.end();
 
+
     }
 
     @Override
@@ -68,6 +69,7 @@ public class SplashScreen implements Screen {
 
     @Override
     public void show() {
+
 
     }
 

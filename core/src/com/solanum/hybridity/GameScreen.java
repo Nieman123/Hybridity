@@ -4,7 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import sun.applet.Main;
@@ -31,9 +35,19 @@ public class GameScreen implements Screen {
     private final Mainland ml;
     private int numOfSeeds = 2;
     private final Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/gamePlay.mp3"));
+    private final Music rave = Gdx.audio.newMusic(Gdx.files.internal("sounds/sand.mp3"));
+    private final Music weed = Gdx.audio.newMusic(Gdx.files.internal("sounds/weed.mp3"));
     private double timeSinceSeederUpdate = 5;
     private double timeSinceEnemyUpdate = 5;
     private int offset = 0;
+    private boolean raving = false;
+    private float lastRave = 0;
+    Batch batch = new SpriteBatch();
+    private float lastSwitch = 0;
+
+
+    private BitmapFont font = new BitmapFont();
+
 
 
     /**
@@ -53,7 +67,7 @@ public class GameScreen implements Screen {
         /**
          * Sets the music at half volume for levelling purposes.
          */
-        music.setVolume(.5f);
+        music.setVolume(.2f);
 
     }
 
@@ -148,7 +162,7 @@ public class GameScreen implements Screen {
             }
         }
 
-        gameStage.addActor(new Seeder((int) (ml.oX + newX), (int) (ml.oY + newY), ml.oX, ml.oY, ml));
+        gameStage.addActor(new Enemy((int) (ml.oX + newX), (int) (ml.oY + newY), ml.oX, ml.oY, angle));
 
     }
 
@@ -158,6 +172,10 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         gameStage.act();
         gameStage.draw();
+
+        if( ((Mainland)gameStage.getRoot().findActor("ml")).hasDispersed ) {
+            phase = 2;
+        }
 
         /**
          * Scans through all of the Actors to determine if there's is still one play.
@@ -186,22 +204,55 @@ public class GameScreen implements Screen {
         }
 
         timeSinceEnemyUpdate +=delta;
-        if(Gdx.input.isKeyPressed(Input.Keys.R) && timeSinceSeederUpdate>5 ){
+        if(Gdx.input.isKeyPressed(Input.Keys.R) && timeSinceEnemyUpdate>5 ){
             timeSinceEnemyUpdate = 0;
 
             float degreeDivision = 360 / 3;
 
             for (int i = 1; i <= numOfSeeds; i++) {
-                plantSeed(i * degreeDivision, 900 * i);
+                plantEnemy(i * degreeDivision, 900 * i);
             }
         }
 
+
+
+        if(Gdx.input.isKeyPressed(Input.Keys.TAB) && lastRave > 1) {
+
+            if(!raving) {
+                weed.play();
+                rave.play();
+                raving = true;
+                lastRave = 0;
+            } else {
+                lastRave = 0;
+                rave.stop();
+                raving = false;
+
+            }
+        }
 
 
         if (!playerActive) {
             game.setScreen(game.loseScreen);
         }
 
+        if(raving){
+
+            if(lastSwitch>.2) {
+                lastSwitch = 0;
+                font.setColor(Color.RED);
+
+            } else {
+                font.setColor(Color.WHITE);
+            }
+            font.setScale(5);
+            batch.begin();
+            font.draw(batch, "COPYRIGHT LUKE STREET 2014", 80, (Gdx.graphics.getHeight()/2) +50);
+            batch.end();
+        }
+
+        lastSwitch +=delta;
+        lastRave+=delta;
 
     }
 
@@ -212,24 +263,24 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        //music.play();
+        music.play();
 
     }
 
     @Override
     public void hide() {
-        //music.stop();
+        music.stop();
 
     }
 
     @Override
     public void pause() {
-        //music.pause();
+        music.pause();
     }
 
     @Override
     public void resume() {
-        //music.play();
+        music.play();
 
     }
 

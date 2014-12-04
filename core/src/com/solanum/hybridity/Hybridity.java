@@ -20,6 +20,6 @@ public class Hybridity extends Game {
         gameScreen = new GameScreen(this);
         splashScreen = new SplashScreen(this);
         loseScreen = new LoseScreen(this);
-        this.setScreen(gameScreen);
+        this.setScreen(splashScreen);
     }
 }
