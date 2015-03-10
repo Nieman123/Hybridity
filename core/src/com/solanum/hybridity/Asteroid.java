@@ -1,6 +1,9 @@
 package com.solanum.hybridity;
 
+import com.badlogic.gdx.math.*;
+
 import java.awt.*;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
@@ -135,7 +138,7 @@ public class Asteroid {
 
         if(timeSinceRotate>.1 && !moving) {
             timeSinceRotate = 0;
-            //rotate(10);
+            rotate(10);
         }
 
     }
@@ -150,7 +153,6 @@ public class Asteroid {
         AffineTransform at = new AffineTransform();
 
         at.rotate(Math.toRadians(1),staticRotationOriginX, staticRotationOriginY);
-
 
         Area test = new Area(body);
 

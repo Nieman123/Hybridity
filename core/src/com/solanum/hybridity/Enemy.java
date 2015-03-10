@@ -24,7 +24,7 @@ public class Enemy extends Actor {
     public final Rectangle collision = new Rectangle();
     private float[] v;
     private final ShapeRenderer render = new ShapeRenderer();
-    private final Texture tex = new Texture("Wanderer.png");
+    private final Texture tex = new Texture("Seeker.png");
     private Sprite sprite = new Sprite(tex);
     private final Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-01.wav"));
     private final Sound death = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion-03.wav"));
@@ -90,6 +90,8 @@ public class Enemy extends Actor {
         sprite.setPosition(getX(), getY());
         collision.set(sprite.getBoundingRectangle());
 
+        lookAt(gX, gY);
+
 
 
     }
@@ -108,6 +110,9 @@ public class Enemy extends Actor {
 
         sprite.draw(batch);
         sprite.setColor(Color.MAGENTA);
+
+
+        sprite.setRotation(getRotation());
 
 
 

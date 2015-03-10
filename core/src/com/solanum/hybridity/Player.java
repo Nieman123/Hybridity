@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import java.util.ArrayList;
-
 /**
  * @author Aldous
  *         Machinedrum - Vapor City Archives
@@ -176,6 +174,7 @@ public class Player extends Actor {
         if (GameScreen.phase == 1) {
 
             if (((Mainland) getStage().getRoot().findActor("ml")).containsPoint((int) (this.getX() + sprite.getWidth() / 2), (int) (this.getY() + sprite.getHeight() / 2))) {
+
             }
         }
 
@@ -211,7 +210,7 @@ public class Player extends Actor {
      * Takes current information about a Joystick's position and return a degree of it's position relative to it's center.
      *
      * @param h The raw float value for the stick's horizontal axis
-     * @param v The raw float value for the stick's vertical acis
+     * @param v The raw float value for the stick's vertical axis
      * @return The integer representation of the degree position of the x axis
      */
     int getStickDegree(float h, float v) {
